@@ -1,8 +1,19 @@
 
 use image_mapper;
 
-fn main() {
-    let r = image_mapper::date_time_string_from_image_path("tests/test_image.jpg");
+use std::path::PathBuf;
+use std::ffi::OsString;
 
-    println!("{}", r.as_str());
+
+fn main() {
+    let string: OsString = OsString::from("JPG");
+    let r = image_mapper::is_image_extension(string.as_os_str());
+
+    println!("{}", r);
+
+
+
+    //let path = PathBuf::from(r"mapp");
+
+    //image_mapper::map_directory(path.as_path(), path.as_path());
 }

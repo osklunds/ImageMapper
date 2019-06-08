@@ -1,3 +1,6 @@
+
+use image_mapper;
+
 fn main() {
-    println!("Hello, world!");
+    image_mapper::open_compress_and_save_image("windows.jpg", "hej.jpg")    
 }

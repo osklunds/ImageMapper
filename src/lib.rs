@@ -15,10 +15,23 @@ use std::path::Path;
 use std::ffi::OsStr;
 use std::ffi::OsString;
 
+use std::fs::Permissions;
+use std::os::unix::fs::PermissionsExt;
+
 use exif::Tag;
 
-pub fn map_directory(source: &Path, _destination: &Path) {
-    println!("Directory: {}", source.display());
+pub fn map_directory(source: &Path, destination: &Path) {
+    println!("Entered src '{}' and dst '{}'", source.display(), destination.display());
+
+    if destination.is_file() {
+        fs::remove_file(destination).unwrap();
+    }
+    if !destination.exists() {
+        fs::create_dir(destination).unwrap();
+    }
+
+
+
     for entry in fs::read_dir(source).unwrap() {
         let entry = entry.unwrap();
         let path = entry.path();
@@ -35,6 +48,15 @@ pub fn map_directory(source: &Path, _destination: &Path) {
 
 
         }
+    }
+}
+
+fn ensure_destination_path_is_directory(destination_path: &Path) {
+    if destination_path.is_file() {
+        fs::remove_file(destination_path).unwrap();
+    }
+    if !destination_path.exists() {
+        fs::create_dir(destination_path).unwrap();
     }
 }
 
@@ -101,4 +123,40 @@ mod tests {
             assert!(!is_image_extension(OsString::from(extension).as_os_str()));
         }
     }
+
+    #[test]
+    fn test_ensure_destination_path_is_directory_removes_file() {
+        let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_removes_file");
+        fs::remove_dir(destination_path);
+        File::create(destination_path);
+
+        ensure_destination_path_is_directory(destination_path);
+
+        assert!(destination_path.is_dir());
+    }
+
+    #[test]
+    fn test_ensure_destination_path_is_directory_adds_directory() {
+        let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_adds_directory");
+        fs::remove_dir(destination_path);
+
+        ensure_destination_path_is_directory(destination_path);
+
+        assert!(destination_path.is_dir());
+    }
+
+    #[test]
+    fn test_ensure_destination_path_is_directory_does_not_remove_directory() {
+        let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_does_not_remove_directory");
+        fs::remove_dir_all(destination_path);
+        fs::create_dir(destination_path);
+
+        let destination_file = destination_path.join("file");
+        File::create(destination_file.as_path());
+
+        ensure_destination_path_is_directory(destination_path);
+
+        assert!(destination_file.as_path().exists());        
+    }
+
 }

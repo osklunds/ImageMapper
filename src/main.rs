@@ -6,14 +6,8 @@ use std::ffi::OsString;
 
 
 fn main() {
-    let string: OsString = OsString::from("JPG");
-    let r = image_mapper::is_image_extension(string.as_os_str());
+    let src = PathBuf::from(r"from");
+    let dst = PathBuf::from(r"to");
 
-    println!("{}", r);
-
-
-
-    //let path = PathBuf::from(r"mapp");
-
-    //image_mapper::map_directory(path.as_path(), path.as_path());
+    image_mapper::map_directory(src.as_path(), dst.as_path());
 }

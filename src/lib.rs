@@ -1,4 +1,6 @@
 
+#![allow(dead_code, unused_variables, unused_imports)]
+
 extern crate image;
 extern crate exif;
 
@@ -9,39 +11,31 @@ use image::ColorType;
 
 use std::fs::File;
 use std::fs;
-use std::path::PathBuf;
+//use std::path::PathBuf;
 use std::path::Path;
 
 use std::ffi::OsStr;
 use std::ffi::OsString;
 
-use std::fs::Permissions;
-use std::os::unix::fs::PermissionsExt;
-
 use exif::Tag;
 
-pub fn map_directory(source: &Path, destination: &Path) {
-    println!("Entered src '{}' and dst '{}'", source.display(), destination.display());
+pub fn map_directory(source_path: &Path, destination_path: &Path) {
+    println!("Entered src '{:?}' and dst '{:?}'", source_path, destination_path);
 
-    if destination.is_file() {
-        fs::remove_file(destination).unwrap();
-    }
-    if !destination.exists() {
-        fs::create_dir(destination).unwrap();
-    }
+    ensure_destination_path_is_directory(destination_path);
 
+    for source_entry in fs::read_dir(source_path).unwrap() {
+        let source_entry = source_entry.unwrap();
+        let source_entry_path = source_entry.path();
+        let entry_name = source_entry_path.strip_prefix(source_path).unwrap();
+        let destination_entry_path = destination_path.join(entry_name);
 
-
-    for entry in fs::read_dir(source).unwrap() {
-        let entry = entry.unwrap();
-        let path = entry.path();
-
-        if path.is_dir() {
-            map_directory(&path, &path);
+        if source_entry_path.is_dir() {
+            map_directory(&source_entry_path, &destination_entry_path);
         } else {
-            println!("File: {}", path.display());
+            println!("File: {}", source_entry_path.display());
 
-            let ext = path.extension();
+            let ext = source_entry_path.extension();
             println!("{:?}", ext);
 
 
@@ -95,6 +89,12 @@ pub fn date_time_string_from_image_path(image_path: &str) -> String {
     return format!("{}", date_time.value.display_as(Tag::DateTimeOriginal));
 }
 
+pub fn destination_file_name_to_file_name(file_name: &str) -> String {
+    let length = file_name.len();
+    let x = file_name.get(22..(length-4)).unwrap();
+    return x.to_string();
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -107,7 +107,7 @@ mod tests {
     }
 
     #[test]
-    fn is_image_extension_true_positive() {
+    fn is_image_extension_is_true_for_image_extensions() {
         let extensions = vec!["jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF", "nef", "NEF", "tif", "TIF", "tiff", "TIFF"];
 
         for extension in extensions.iter() {
@@ -116,7 +116,7 @@ mod tests {
     }
 
     #[test]
-    fn is_image_extension_true_negative() {
+    fn is_image_extension_is_false_for_non_image_extensions() {
         let extensions = vec!["m4v", "mp4", "mov", "pdf", "doc"];
 
         for extension in extensions.iter() {
@@ -127,8 +127,8 @@ mod tests {
     #[test]
     fn test_ensure_destination_path_is_directory_removes_file() {
         let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_removes_file");
-        fs::remove_dir(destination_path);
-        File::create(destination_path);
+        fs::remove_dir(destination_path).unwrap();
+        File::create(destination_path).unwrap();
 
         ensure_destination_path_is_directory(destination_path);
 
@@ -138,7 +138,7 @@ mod tests {
     #[test]
     fn test_ensure_destination_path_is_directory_adds_directory() {
         let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_adds_directory");
-        fs::remove_dir(destination_path);
+        fs::remove_dir(destination_path).unwrap();
 
         ensure_destination_path_is_directory(destination_path);
 
@@ -148,15 +148,24 @@ mod tests {
     #[test]
     fn test_ensure_destination_path_is_directory_does_not_remove_directory() {
         let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_does_not_remove_directory");
-        fs::remove_dir_all(destination_path);
-        fs::create_dir(destination_path);
+        fs::remove_dir_all(destination_path).unwrap();
+        fs::create_dir(destination_path).unwrap();
 
         let destination_file = destination_path.join("file");
-        File::create(destination_file.as_path());
+        File::create(destination_file.as_path()).unwrap();
 
         ensure_destination_path_is_directory(destination_path);
 
         assert!(destination_file.as_path().exists());        
     }
+
+    #[test]
+    fn test_destination_file_name_to_file_name() {
+        let destination_file_name = "2019-06-16 07:42:30   filename.jpg.jpg";
+        let file_name = destination_file_name_to_file_name(destination_file_name);
+        assert_eq!("filename.jpg", file_name);
+    }
+
+
 
 }

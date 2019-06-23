@@ -11,6 +11,7 @@ use image::ColorType;
 
 use std::fs::File;
 use std::fs;
+use std::fs::ReadDir;
 use std::path::PathBuf;
 use std::path::Path;
 
@@ -22,10 +23,10 @@ use exif::Tag;
 pub fn map_directory(source_path: &Path, destination_path: &Path) {
     println!("Entered src '{:?}' and dst '{:?}'", source_path, destination_path);
 
-    ensure_destination_path_is_directory(destination_path);
+    //ensure_destination_path_is_directory(destination_path);
 
     iterate_source_entries(source_path, destination_path);
-    iterate_destination_entries(source_path, destination_path);
+    //iterate_destination_entries(source_path, destination_path);
 }
 
 fn ensure_destination_path_is_directory(destination_path: &Path) {
@@ -38,7 +39,12 @@ fn ensure_destination_path_is_directory(destination_path: &Path) {
 }
 
 fn iterate_source_entries(source_path: &Path, destination_path: &Path) {
-    for source_entry in fs::read_dir(source_path).unwrap() {
+    let iterator = match read_dir_to_iterator(source_path) {
+        Some(it) => it,
+        None => return ()
+    };
+
+    for source_entry in iterator {
         let source_entry = source_entry.unwrap();
         let source_entry_path: PathBuf = source_entry.path();
         let source_entry_name: &Path = source_entry_path.strip_prefix(source_path).unwrap();
@@ -61,6 +67,16 @@ fn iterate_source_entries(source_path: &Path, destination_path: &Path) {
                     }
                 }
             }
+        }
+    }
+}
+
+fn read_dir_to_iterator(path: &Path) -> Option<ReadDir> {
+    match fs::read_dir(path) {
+        Ok(it) => Some(it),
+        Err(e) => {
+            println!("Could not open \"{}\": {}", path.canonicalize().unwrap().display(), e);
+            return None;
         }
     }
 }

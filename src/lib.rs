@@ -34,12 +34,12 @@ pub fn map_directory(source_path: &Path, destination_path: &Path) {
 
             map_directory(&source_entry_path, &destination_entry_path);
         } else {
-            
             let extension = source_entry_path.extension();
 
             if let Some(extension) = extension {
                 if extension_is_image_extension(extension) {
                     let destination_entry_name = destination_file_name_from_image_path(&source_entry_path);
+                    println!("{:?}", destination_entry_name);
                     let destination_entry_path: PathBuf = destination_path.join(destination_entry_name);
 
                     if !destination_entry_path.exists() {
@@ -49,7 +49,7 @@ pub fn map_directory(source_path: &Path, destination_path: &Path) {
             }
         }
     }
-
+    
     for destination_entry in fs::read_dir(destination_path).unwrap() {
         let destination_entry = destination_entry.unwrap();
         let destination_entry_path: PathBuf = destination_entry.path();
@@ -61,14 +61,33 @@ pub fn map_directory(source_path: &Path, destination_path: &Path) {
             if !source_entry_path.is_dir() {
                 fs::remove_dir_all(destination_entry_path).unwrap();
             }
+        } else {
+            let extension = destination_entry_path.extension();
+
+            if let Some(extension) = extension {
+                if extension_is_destination_format_extension(extension) {
+                    let source_entry_name: String = destination_file_name_to_file_name(destination_entry_name.to_str().unwrap());
+                    
+                    let source_entry_path = source_path.join(source_entry_name);
+
+                    if !source_entry_path.is_file() {
+                        fs::remove_file(destination_entry_path).unwrap();
+                    }
+                    
+                } else if extension_is_image_extension(extension) {
+                    let source_entry_path = source_path.join(destination_entry_name);
+
+                    if !source_entry_path.is_file() {
+                        println!("Want to delete2 {:?}", destination_entry_path);
+                        fs::remove_file(destination_entry_path).unwrap();
+                    }
+                }
+            } else {
+                println!("Want to delete3 {:?}", destination_entry_path);
+                fs::remove_file(destination_entry_path).unwrap();
+            }
         }
-
-
-
     }
-
-
-
 }
 
 fn ensure_destination_path_is_directory(destination_path: &Path) {
@@ -95,6 +114,12 @@ pub fn extension_is_image_extension(extension: &OsStr) -> bool {
     }
 }
 
+pub fn extension_is_destination_format_extension(extension: &OsStr) -> bool {
+    let string = extension.to_str().unwrap().to_lowercase();
+
+    return string.as_str() == "jpg";
+}
+
 pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path) {
     let original = image::open(source_path).unwrap();
     let resized = original.resize(1024, 1024, Gaussian);
@@ -111,7 +136,7 @@ pub fn destination_file_name_from_image_path(image_path: &Path) -> String {
     let file_name = image_path.file_name().unwrap();
     let date_time_string = date_time_string_from_image_path(image_path);
     if date_time_string.is_empty() {
-        return String::from("");
+        return String::from(file_name.to_str().unwrap());
     } else {
         return format!("   {} {}.jpg", date_time_string, file_name.to_str().unwrap());
     }
@@ -132,8 +157,12 @@ pub fn date_time_string_from_image_path(image_path: &Path) -> String {
 
 pub fn destination_file_name_to_file_name(file_name: &str) -> String {
     let length = file_name.len();
-    let x = file_name.get(23..(length-4)).unwrap();
-    return x.to_string();
+    if length < 24 {
+        return String::from(file_name);
+    } else {
+        let x = file_name.get(23..(length-4)).unwrap();
+        return x.to_string();
+    }
 }
 
 #[cfg(test)]

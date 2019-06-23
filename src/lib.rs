@@ -43,13 +43,10 @@ pub fn map_directory(source_path: &Path, destination_path: &Path) {
                     let destination_entry_name = format!("{}{}.jpg", date_time_string, source_entry_name.display());
                     let destination_entry_path: PathBuf = destination_path.join(destination_entry_name);
 
-                    println!("{:?}", destination_entry_path);
-
-                    if destination_entry_path.exists() {
-                        println!("Exists");
-                    } else {
-                        println!("Does not exist");
+                    if !destination_entry_path.exists() {
+                        open_compress_and_save_image(&source_entry_path, &destination_entry_path);
                     }
+
                 }
             }
 
@@ -87,7 +84,7 @@ pub fn extension_is_image_extension(extension: &OsStr) -> bool {
     }
 }
 
-pub fn open_compress_and_save_image(source_path: &str, destination_path: &str) {
+pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path) {
     let original = image::open(source_path).unwrap();
     let resized = original.resize(1024, 1024, Gaussian);
     let width = resized.width();
@@ -99,20 +96,14 @@ pub fn open_compress_and_save_image(source_path: &str, destination_path: &str) {
     encoder.encode(&pixels, width, height, ColorType::RGB(8)).unwrap();
 }
 
+// Returns a string of the format "   yyyy-mm-dd hh;mm;ss " if the image has an exif date, or "" if it doesn't.
 pub fn date_time_string_from_image_path(image_path: &str) -> String {
-
-
     let file = std::fs::File::open(image_path).unwrap();
-
-    
-
     let reader = exif::Reader::new(&mut std::io::BufReader::new(&file));
 
     if let Ok(r) = reader {
         let date_time = r.get_field(Tag::DateTimeOriginal, false).unwrap();
-
         return format!("   {} ", date_time.value.display_as(Tag::DateTimeOriginal)).replace(":",";");
-
     } else {
         return String::from("");
     }

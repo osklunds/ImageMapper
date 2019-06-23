@@ -132,7 +132,7 @@ mod tests {
     fn date_time_string_is_correct() {
         let string = date_time_string_from_image_path("tests/test_image.jpg");
 
-        assert_eq!(string.as_str(),"2004-04-09 17:33:15");
+        assert_eq!(string.as_str(),"   2004-04-09 17;33;15 ");
     }
 
     #[test]
@@ -140,7 +140,7 @@ mod tests {
         let extensions = vec!["jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF", "nef", "NEF", "tif", "TIF", "tiff", "TIFF"];
 
         for extension in extensions.iter() {
-            assert!(is_image_extension(OsString::from(extension).as_os_str()));
+            assert!(extension_is_image_extension(OsString::from(extension).as_os_str()));
         }
     }
 
@@ -149,7 +149,7 @@ mod tests {
         let extensions = vec!["m4v", "mp4", "mov", "pdf", "doc"];
 
         for extension in extensions.iter() {
-            assert!(!is_image_extension(OsString::from(extension).as_os_str()));
+            assert!(!extension_is_image_extension(OsString::from(extension).as_os_str()));
         }
     }
 

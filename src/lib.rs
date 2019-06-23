@@ -12,11 +12,15 @@ use image::ColorType;
 use std::fs::File;
 use std::fs;
 use std::fs::ReadDir;
+use std::fs::DirEntry;
+
 use std::path::PathBuf;
 use std::path::Path;
 
 use std::ffi::OsStr;
 use std::ffi::OsString;
+
+use std::io;
 
 use exif::Tag;
 
@@ -45,7 +49,11 @@ fn iterate_source_entries(source_path: &Path, destination_path: &Path) {
     };
 
     for source_entry in iterator {
-        let source_entry = source_entry.unwrap();
+        let source_entry = match unwrap_dir_entry(source_entry) {
+            Some(se) => se,
+            None => return ()
+        };
+
         let source_entry_path: PathBuf = source_entry.path();
         let source_entry_name: &Path = source_entry_path.strip_prefix(source_path).unwrap();
 
@@ -77,6 +85,16 @@ fn read_dir_to_iterator(path: &Path) -> Option<ReadDir> {
         Err(e) => {
             println!("Could not open \"{}\": {}", path.canonicalize().unwrap().display(), e);
             return None;
+        }
+    }
+}
+
+fn unwrap_dir_entry(dir_entry: io::Result<DirEntry>) -> Option<DirEntry> {
+    match dir_entry {
+        Ok(dir_entry) => Some(dir_entry),
+        Err(e) => {
+            println!("Error with an entry: {}", e);
+            None
         }
     }
 }

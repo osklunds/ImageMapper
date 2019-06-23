@@ -24,6 +24,20 @@ pub fn map_directory(source_path: &Path, destination_path: &Path) {
 
     ensure_destination_path_is_directory(destination_path);
 
+    iterate_source_entries(source_path, destination_path);
+    iterate_destination_entries(source_path, destination_path);
+}
+
+fn ensure_destination_path_is_directory(destination_path: &Path) {
+    if destination_path.is_file() {
+        fs::remove_file(destination_path).unwrap();
+    }
+    if !destination_path.exists() {
+        fs::create_dir(destination_path).unwrap();
+    }
+}
+
+fn iterate_source_entries(source_path: &Path, destination_path: &Path) {
     for source_entry in fs::read_dir(source_path).unwrap() {
         let source_entry = source_entry.unwrap();
         let source_entry_path: PathBuf = source_entry.path();
@@ -49,7 +63,9 @@ pub fn map_directory(source_path: &Path, destination_path: &Path) {
             }
         }
     }
-    
+}
+
+fn iterate_destination_entries(source_path: &Path, destination_path: &Path) {
     for destination_entry in fs::read_dir(destination_path).unwrap() {
         let destination_entry = destination_entry.unwrap();
         let destination_entry_path: PathBuf = destination_entry.path();
@@ -87,15 +103,6 @@ pub fn map_directory(source_path: &Path, destination_path: &Path) {
                 fs::remove_file(destination_entry_path).unwrap();
             }
         }
-    }
-}
-
-fn ensure_destination_path_is_directory(destination_path: &Path) {
-    if destination_path.is_file() {
-        fs::remove_file(destination_path).unwrap();
-    }
-    if !destination_path.exists() {
-        fs::create_dir(destination_path).unwrap();
     }
 }
 

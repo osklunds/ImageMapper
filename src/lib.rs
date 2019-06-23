@@ -39,25 +39,24 @@ pub fn map_directory(source_path: &Path, destination_path: &Path) {
 
             if let Some(extension) = extension {
                 if extension_is_image_extension(extension) {
-                    let date_time_string = date_time_string_from_image_path(source_entry_path.to_str().unwrap());
-                    let destination_entry_name = format!("{}{}.jpg", date_time_string, source_entry_name.display());
+                    let destination_entry_name = destination_file_name_from_image_path(&source_entry_path);
                     let destination_entry_path: PathBuf = destination_path.join(destination_entry_name);
 
                     if !destination_entry_path.exists() {
                         open_compress_and_save_image(&source_entry_path, &destination_entry_path);
                     }
-
                 }
             }
-
-            
-
-        
-
-
-
         }
     }
+
+    for destination_entry in fs::read_dir(destination_path).unwrap() {
+
+
+    }
+
+
+
 }
 
 fn ensure_destination_path_is_directory(destination_path: &Path) {
@@ -96,14 +95,24 @@ pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path)
     encoder.encode(&pixels, width, height, ColorType::RGB(8)).unwrap();
 }
 
-// Returns a string of the format "   yyyy-mm-dd hh;mm;ss " if the image has an exif date, or "" if it doesn't.
-pub fn date_time_string_from_image_path(image_path: &str) -> String {
+pub fn destination_file_name_from_image_path(image_path: &Path) -> String {
+    let file_name = image_path.file_name().unwrap();
+    let date_time_string = date_time_string_from_image_path(image_path);
+    if date_time_string.is_empty() {
+        return String::from("");
+    } else {
+        return format!("   {} {}.jpg", date_time_string, file_name.to_str().unwrap());
+    }
+}
+
+// Returns a string of the format "yyyy-mm-dd hh;mm;ss" if the image has an exif date, or "" if it doesn't.
+pub fn date_time_string_from_image_path(image_path: &Path) -> String {
     let file = std::fs::File::open(image_path).unwrap();
     let reader = exif::Reader::new(&mut std::io::BufReader::new(&file));
 
     if let Ok(r) = reader {
         let date_time = r.get_field(Tag::DateTimeOriginal, false).unwrap();
-        return format!("   {} ", date_time.value.display_as(Tag::DateTimeOriginal)).replace(":",";");
+        return format!("{}", date_time.value.display_as(Tag::DateTimeOriginal)).replace(":",";");
     } else {
         return String::from("");
     }
@@ -111,7 +120,7 @@ pub fn date_time_string_from_image_path(image_path: &str) -> String {
 
 pub fn destination_file_name_to_file_name(file_name: &str) -> String {
     let length = file_name.len();
-    let x = file_name.get(22..(length-4)).unwrap();
+    let x = file_name.get(23..(length-4)).unwrap();
     return x.to_string();
 }
 
@@ -121,9 +130,10 @@ mod tests {
 
     #[test]
     fn date_time_string_is_correct() {
-        let string = date_time_string_from_image_path("tests/test_image.jpg");
+        let image_path = PathBuf::from(r"tests/test_image.jpg");
+        let date_time_string = date_time_string_from_image_path(&image_path);
 
-        assert_eq!(string.as_str(),"   2004-04-09 17;33;15 ");
+        assert_eq!(date_time_string,"2004-04-09 17;33;15");
     }
 
     #[test]
@@ -181,9 +191,10 @@ mod tests {
 
     #[test]
     fn test_destination_file_name_to_file_name() {
-        let destination_file_name = "2019-06-16 07:42:30   filename.jpg.jpg";
-        let file_name = destination_file_name_to_file_name(destination_file_name);
-        assert_eq!("filename.jpg", file_name);
+        let destination_path = PathBuf::from(r"tests/test_image.jpg");
+        let destination_file_name = destination_file_name_from_image_path(&destination_path);
+        let file_name = destination_file_name_to_file_name(&destination_file_name);
+        assert_eq!("test_image.jpg", file_name);
     }
 
 

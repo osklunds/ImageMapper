@@ -51,6 +51,18 @@ pub fn map_directory(source_path: &Path, destination_path: &Path) {
     }
 
     for destination_entry in fs::read_dir(destination_path).unwrap() {
+        let destination_entry = destination_entry.unwrap();
+        let destination_entry_path: PathBuf = destination_entry.path();
+        let destination_entry_name: &Path = destination_entry_path.strip_prefix(destination_path).unwrap();
+
+        if destination_entry_path.is_dir() {
+            let source_entry_path = source_path.join(destination_entry_name);
+
+            if !source_entry_path.is_dir() {
+                fs::remove_dir_all(destination_entry_path).unwrap();
+            }
+        }
+
 
 
     }

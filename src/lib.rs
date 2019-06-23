@@ -11,7 +11,7 @@ use image::ColorType;
 
 use std::fs::File;
 use std::fs;
-//use std::path::PathBuf;
+use std::path::PathBuf;
 use std::path::Path;
 
 use std::ffi::OsStr;
@@ -26,18 +26,36 @@ pub fn map_directory(source_path: &Path, destination_path: &Path) {
 
     for source_entry in fs::read_dir(source_path).unwrap() {
         let source_entry = source_entry.unwrap();
-        let source_entry_path = source_entry.path();
-        let entry_name = source_entry_path.strip_prefix(source_path).unwrap();
-        let destination_entry_path = destination_path.join(entry_name);
+        let source_entry_path: PathBuf = source_entry.path();
+        let source_entry_name: &Path = source_entry_path.strip_prefix(source_path).unwrap();
 
         if source_entry_path.is_dir() {
+            let destination_entry_path: PathBuf = destination_path.join(source_entry_name);
+
             map_directory(&source_entry_path, &destination_entry_path);
         } else {
-            println!("File: {}", source_entry_path.display());
+            
+            let extension = source_entry_path.extension();
 
-            let ext = source_entry_path.extension();
-            println!("{:?}", ext);
+            if let Some(extension) = extension {
+                if extension_is_image_extension(extension) {
+                    let date_time_string = date_time_string_from_image_path(source_entry_path.to_str().unwrap());
+                    let destination_entry_name = format!("{}{}.jpg", date_time_string, source_entry_name.display());
+                    let destination_entry_path: PathBuf = destination_path.join(destination_entry_name);
 
+                    println!("{:?}", destination_entry_path);
+
+                    if destination_entry_path.exists() {
+                        println!("Exists");
+                    } else {
+                        println!("Does not exist");
+                    }
+                }
+            }
+
+            
+
+        
 
 
 
@@ -54,7 +72,7 @@ fn ensure_destination_path_is_directory(destination_path: &Path) {
     }
 }
 
-pub fn is_image_extension(extension: &OsStr) -> bool {
+pub fn extension_is_image_extension(extension: &OsStr) -> bool {
     let string = extension.to_str().unwrap().to_lowercase();
 
     match string.as_str() {
@@ -82,11 +100,22 @@ pub fn open_compress_and_save_image(source_path: &str, destination_path: &str) {
 }
 
 pub fn date_time_string_from_image_path(image_path: &str) -> String {
-    let file = std::fs::File::open(image_path).unwrap();
-    let reader = exif::Reader::new(&mut std::io::BufReader::new(&file)).unwrap();
-    let date_time = reader.get_field(Tag::DateTimeOriginal, false).unwrap();
 
-    return format!("{}", date_time.value.display_as(Tag::DateTimeOriginal));
+
+    let file = std::fs::File::open(image_path).unwrap();
+
+    
+
+    let reader = exif::Reader::new(&mut std::io::BufReader::new(&file));
+
+    if let Ok(r) = reader {
+        let date_time = r.get_field(Tag::DateTimeOriginal, false).unwrap();
+
+        return format!("   {} ", date_time.value.display_as(Tag::DateTimeOriginal)).replace(":",";");
+
+    } else {
+        return String::from("");
+    }
 }
 
 pub fn destination_file_name_to_file_name(file_name: &str) -> String {

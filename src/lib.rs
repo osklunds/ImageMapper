@@ -27,13 +27,13 @@ use exif::Tag;
 pub fn map_directory(source_path: &Path, destination_path: &Path) {
     println!("Entered src '{:?}' and dst '{:?}'", source_path, destination_path);
 
-    //ensure_destination_path_is_directory(destination_path);
+    ensure_path_is_directory(destination_path);
 
     iterate_source_entries(source_path, destination_path);
     //iterate_destination_entries(source_path, destination_path);
 }
 
-fn ensure_destination_path_is_directory(destination_path: &Path) {
+fn ensure_path_is_directory(destination_path: &Path) {
     if destination_path.is_file() {
         fs::remove_file(destination_path).unwrap();
     }
@@ -251,28 +251,28 @@ mod tests {
     }
 
     #[test]
-    fn test_ensure_destination_path_is_directory_removes_file() {
+    fn test_ensure_path_is_directory_removes_file() {
         let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_removes_file");
         fs::remove_dir(destination_path).unwrap();
         File::create(destination_path).unwrap();
 
-        ensure_destination_path_is_directory(destination_path);
+        ensure_path_is_directory(destination_path);
 
         assert!(destination_path.is_dir());
     }
 
     #[test]
-    fn test_ensure_destination_path_is_directory_adds_directory() {
+    fn test_ensure_path_is_directory_adds_directory() {
         let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_adds_directory");
         fs::remove_dir(destination_path).unwrap();
 
-        ensure_destination_path_is_directory(destination_path);
+        ensure_path_is_directory(destination_path);
 
         assert!(destination_path.is_dir());
     }
 
     #[test]
-    fn test_ensure_destination_path_is_directory_does_not_remove_directory() {
+    fn test_ensure_path_is_directory_does_not_remove_directory() {
         let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_does_not_remove_directory");
         fs::remove_dir_all(destination_path).unwrap();
         fs::create_dir(destination_path).unwrap();
@@ -280,7 +280,7 @@ mod tests {
         let destination_file = destination_path.join("file");
         File::create(destination_file.as_path()).unwrap();
 
-        ensure_destination_path_is_directory(destination_path);
+        ensure_path_is_directory(destination_path);
 
         assert!(destination_file.as_path().exists());        
     }

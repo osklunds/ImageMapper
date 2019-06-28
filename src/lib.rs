@@ -53,24 +53,14 @@ fn iterate_source_entries(source_path: &Path, destination_path: &Path) {
             Some(se) => se,
             None => continue
         };
-        let source_entry_path: PathBuf = source_entry.path();
+
+        let source_entry_path_buf: PathBuf = source_entry.path();
+        let source_entry_path: &Path = &source_entry_path_buf;
 
         if source_entry_path.is_dir() {
-            handle_source_dir(&source_entry_path, source_path, destination_path);
+            handle_source_dir(source_entry_path, source_path, destination_path);
         } else {
-            let extension = source_entry_path.extension();
-
-            if let Some(extension) = extension {
-                if extension_is_image_extension(extension) {
-                    let destination_entry_name = destination_file_name_from_image_path(&source_entry_path);
-                    println!("{:?}", destination_entry_name);
-                    let destination_entry_path: PathBuf = destination_path.join(destination_entry_name);
-
-                    if !destination_entry_path.exists() {
-                        open_compress_and_save_image(&source_entry_path, &destination_entry_path);
-                    }
-                }
-            }
+            handle_source_file(source_entry_path, destination_path);
         }
     }
 }
@@ -101,6 +91,26 @@ fn handle_source_dir(source_dir_path: &Path, source_path: &Path, destination_pat
     let destination_dir_path: PathBuf = destination_path.join(source_dir_name);
 
     map_directory(source_dir_path, &destination_dir_path);
+}
+
+fn handle_source_file(source_file_path: &Path, destination_path: &Path) {
+    let extension: Option<&OsStr> = source_file_path.extension();
+
+    if let Some(extension) = extension {
+        if extension_is_image_extension(extension) {
+            handle_source_image(source_file_path, destination_path);
+        }
+    }
+}
+
+fn handle_source_image(source_image_path: &Path, destination_path: &Path) {
+    let destination_image_name: String = destination_image_name_from_image_path(source_image_path);
+    println!("{:?}", destination_image_name);
+    let destination_image_path: PathBuf = destination_path.join(destination_image_name);
+
+    if !destination_image_path.exists() {
+        open_compress_and_save_image(source_image_path, &destination_image_path);
+    }
 }
 
 fn iterate_destination_entries(source_path: &Path, destination_path: &Path) {
@@ -177,7 +187,7 @@ pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path)
     encoder.encode(&pixels, width, height, ColorType::RGB(8)).unwrap();
 }
 
-pub fn destination_file_name_from_image_path(image_path: &Path) -> String {
+pub fn destination_image_name_from_image_path(image_path: &Path) -> String {
     let file_name = image_path.file_name().unwrap();
     let date_time_string = date_time_string_from_image_path(image_path);
     if date_time_string.is_empty() {

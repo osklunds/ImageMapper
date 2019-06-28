@@ -30,7 +30,7 @@ pub fn map_directory(source_path: &Path, destination_path: &Path) {
     ensure_path_is_directory(destination_path);
 
     iterate_source_entries(source_path, destination_path);
-    //iterate_destination_entries(source_path, destination_path);
+    iterate_destination_entries(source_path, destination_path);
 }
 
 fn ensure_path_is_directory(destination_path: &Path) {
@@ -114,6 +114,42 @@ fn handle_source_image(source_image_path: &Path, destination_path: &Path) {
 }
 
 fn iterate_destination_entries(source_path: &Path, destination_path: &Path) {
+    let destination_entries = match read_dir_to_iterator(destination_path) {
+        Some(iterator) => iterator,
+        None           => return ()
+    };
+
+    for destination_entry in destination_entries {
+        let destination_entry = match unwrap_dir_entry(destination_entry) {
+            Some(de) => de,
+            None     => return ()
+        };
+
+        let destination_entry_path_buf = destination_entry.path();
+        let destination_entry_path = &destination_entry_path_buf;
+        let destination_entry_name = destination_entry_path.strip_prefix(destination_path).unwrap();
+        let corresponding_source_entry_path_buf = source_path.join(destination_entry_name);
+        let corresponding_source_entry_path = & corresponding_source_entry_path_buf;
+
+        if destination_entry_path.is_dir() {
+            handle_destination_dir(destination_entry_path, corresponding_source_entry_path);
+        } else {
+
+        }
+
+
+
+
+    }
+}
+
+fn handle_destination_dir(destination_dir_path: &Path, corresponding_source_entry_path: &Path) {
+    if !corresponding_source_entry_path.is_dir() {
+        fs::remove_dir_all(destination_dir_path).unwrap();
+    }
+}
+
+/*
     for destination_entry in fs::read_dir(destination_path).unwrap() {
         let destination_entry = destination_entry.unwrap();
         let destination_entry_path: PathBuf = destination_entry.path();
@@ -153,7 +189,7 @@ fn iterate_destination_entries(source_path: &Path, destination_path: &Path) {
         }
     }
 }
-
+*/
 pub fn extension_is_image_extension(extension: &OsStr) -> bool {
     let string = extension.to_str().unwrap().to_lowercase();
 

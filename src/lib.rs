@@ -43,24 +43,20 @@ fn ensure_destination_path_is_directory(destination_path: &Path) {
 }
 
 fn iterate_source_entries(source_path: &Path, destination_path: &Path) {
-    let iterator = match read_dir_to_iterator(source_path) {
+    let source_entries = match read_dir_to_iterator(source_path) {
         Some(it) => it,
         None => return ()
     };
 
-    for source_entry in iterator {
+    for source_entry in source_entries {
         let source_entry = match unwrap_dir_entry(source_entry) {
             Some(se) => se,
-            None => return ()
+            None => continue
         };
-
         let source_entry_path: PathBuf = source_entry.path();
-        let source_entry_name: &Path = source_entry_path.strip_prefix(source_path).unwrap();
 
         if source_entry_path.is_dir() {
-            let destination_entry_path: PathBuf = destination_path.join(source_entry_name);
-
-            map_directory(&source_entry_path, &destination_entry_path);
+            handle_source_dir(&source_entry_path, source_path, destination_path);
         } else {
             let extension = source_entry_path.extension();
 
@@ -97,6 +93,14 @@ fn unwrap_dir_entry(dir_entry: io::Result<DirEntry>) -> Option<DirEntry> {
             None
         }
     }
+}
+
+// Important: source_path must be a super path of source_dir_path.
+fn handle_source_dir(source_dir_path: &Path, source_path: &Path, destination_path: &Path) {
+    let source_dir_name: &Path = source_dir_path.strip_prefix(source_path).unwrap();
+    let destination_dir_path: PathBuf = destination_path.join(source_dir_name);
+
+    map_directory(source_dir_path, &destination_dir_path);
 }
 
 fn iterate_destination_entries(source_path: &Path, destination_path: &Path) {

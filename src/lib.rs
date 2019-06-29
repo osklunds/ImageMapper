@@ -127,69 +127,67 @@ fn iterate_destination_entries(source_path: &Path, destination_path: &Path) {
 
         let destination_entry_path_buf = destination_entry.path();
         let destination_entry_path = &destination_entry_path_buf;
-        let destination_entry_name = destination_entry_path.strip_prefix(destination_path).unwrap();
-        let corresponding_source_entry_path_buf = source_path.join(destination_entry_name);
-        let corresponding_source_entry_path = & corresponding_source_entry_path_buf;
 
         if destination_entry_path.is_dir() {
-            handle_destination_dir(destination_entry_path, corresponding_source_entry_path);
+            handle_destination_dir(destination_entry_path, source_path);
         } else {
-
-        }
-
-
-
-
-    }
-}
-
-fn handle_destination_dir(destination_dir_path: &Path, corresponding_source_entry_path: &Path) {
-    if !corresponding_source_entry_path.is_dir() {
-        fs::remove_dir_all(destination_dir_path).unwrap();
-    }
-}
-
-/*
-    for destination_entry in fs::read_dir(destination_path).unwrap() {
-        let destination_entry = destination_entry.unwrap();
-        let destination_entry_path: PathBuf = destination_entry.path();
-        let destination_entry_name: &Path = destination_entry_path.strip_prefix(destination_path).unwrap();
-
-        if destination_entry_path.is_dir() {
-            let source_entry_path = source_path.join(destination_entry_name);
-
-            if !source_entry_path.is_dir() {
-                fs::remove_dir_all(destination_entry_path).unwrap();
-            }
-        } else {
-            let extension = destination_entry_path.extension();
-
-            if let Some(extension) = extension {
-                if extension_is_destination_format_extension(extension) {
-                    let source_entry_name: String = destination_file_name_to_file_name(destination_entry_name.to_str().unwrap());
-                    
-                    let source_entry_path = source_path.join(source_entry_name);
-
-                    if !source_entry_path.is_file() {
-                        fs::remove_file(destination_entry_path).unwrap();
-                    }
-                    
-                } else if extension_is_image_extension(extension) {
-                    let source_entry_path = source_path.join(destination_entry_name);
-
-                    if !source_entry_path.is_file() {
-                        println!("Want to delete2 {:?}", destination_entry_path);
-                        fs::remove_file(destination_entry_path).unwrap();
-                    }
-                }
-            } else {
-                println!("Want to delete3 {:?}", destination_entry_path);
-                fs::remove_file(destination_entry_path).unwrap();
-            }
+            handle_destination_file(destination_entry_path, source_path);
         }
     }
 }
-*/
+
+fn handle_destination_dir(destination_dir_path: &Path, source_path: &Path) {
+    let destination_dir_name = destination_dir_path.file_name();
+
+    if let Some(destination_dir_name) = destination_dir_name {
+        let corresponding_source_entry_path = source_path.join(destination_dir_name);
+
+        if !corresponding_source_entry_path.is_dir() {
+            fs::remove_dir_all(destination_dir_path).unwrap();
+        }
+    } else {
+        //TODO
+    }
+}
+
+fn handle_destination_file(destination_file_path: &Path, source_path: &Path) {
+    let extension = destination_file_path.extension();
+
+    if let Some(extension) = extension {
+        if extension_is_destination_file_extension(extension) {
+            handle_destination_image(destination_file_path, source_path);
+        } else {
+            handle_destination_non_image_file(destination_file_path);
+        }
+    } else {
+        handle_destination_extensionless_file(destination_file_path);
+    }
+}
+
+fn handle_destination_image(destination_image_path: &Path,source_path: &Path) {
+    let destination_image_name = destination_image_path.file_name();
+
+    if let Some(destination_image_name) = destination_image_name {
+        let corresponding_source_entry_name: String = destination_image_name_to_source_image_name(destination_image_name.to_str().unwrap());
+        let corresponding_source_entry_path = source_path.join(corresponding_source_entry_name);
+
+        if !corresponding_source_entry_path.is_file() {
+            fs::remove_file(destination_image_path).unwrap();
+        }
+
+    } else {
+        //TODO
+    }
+}
+
+fn handle_destination_non_image_file(destination_file_path: &Path) {
+    fs::remove_file(destination_file_path).unwrap();
+}
+
+fn handle_destination_extensionless_file(destination_file_path: &Path) {
+    fs::remove_file(destination_file_path).unwrap();
+}
+
 pub fn extension_is_image_extension(extension: &OsStr) -> bool {
     let string = extension.to_str().unwrap().to_lowercase();
 
@@ -205,7 +203,7 @@ pub fn extension_is_image_extension(extension: &OsStr) -> bool {
     }
 }
 
-pub fn extension_is_destination_format_extension(extension: &OsStr) -> bool {
+pub fn extension_is_destination_file_extension(extension: &OsStr) -> bool {
     let string = extension.to_str().unwrap().to_lowercase();
 
     return string.as_str() == "jpg";
@@ -246,7 +244,7 @@ pub fn date_time_string_from_image_path(image_path: &Path) -> String {
     }
 }
 
-pub fn destination_file_name_to_file_name(file_name: &str) -> String {
+pub fn destination_image_name_to_source_image_name(file_name: &str) -> String {
     let length = file_name.len();
     if length < 24 {
         return String::from(file_name);

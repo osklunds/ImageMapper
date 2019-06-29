@@ -106,15 +106,23 @@ mod tests {
         }
     }
 
-/*
     #[test]
-    fn date_time_string_is_correct() {
-        let image_path = PathBuf::from(r"tests/test_image.jpg");
+    fn date_time_string_is_correct_for_image_with_exif() {
+        let image_path = PathBuf::from(r"tests/image_with_exif.jpg");
         let date_time_string = date_time_string_from_image_path(&image_path);
 
         assert_eq!(date_time_string,"2004-04-09 17;33;15");
     }
+
+    #[test]
+    fn date_time_string_is_correct_for_image_without_exif() {
+        let image_path = PathBuf::from(r"tests/image_without_exif.jpg");
+        let date_time_string = date_time_string_from_image_path(&image_path);
+
+        assert_eq!(date_time_string,"");
+    }
     
+    /*
     #[test]
     fn test_destination_file_name_to_file_name() {
         let destination_path = PathBuf::from(r"tests/test_image.jpg");

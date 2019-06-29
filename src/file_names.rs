@@ -31,23 +31,29 @@ pub fn extension_is_image_extension(extension: &OsStr) -> bool {
 }
 
 pub fn extension_is_destination_file_extension(extension: &OsStr) -> bool {
-    let string = extension.to_str().unwrap().to_lowercase();
-
-    return string.as_str() == "jpg";
+    if let Some(extension) = extension.to_str() {
+        match extension.to_lowercase().as_str() {
+            "jpg" => true,
+            _ => false
+        }
+    } else {
+        false
+    }
 }
 
-pub fn destination_image_name_from_image_path(image_path: &Path) -> String {
-    let file_name = image_path.file_name().unwrap();
+pub fn destination_image_name_from_image_path(image_path: &Path) -> Option<String> {
+    let file_name = image_path.file_name()?.to_str()?;
     let date_time_string = date_time_string_from_image_path(image_path);
+
     if date_time_string.is_empty() {
-        return String::from(file_name.to_str().unwrap());
+        Some(format!("{}.jpg", file_name))
     } else {
-        return format!("   {} {}.jpg", date_time_string, file_name.to_str().unwrap());
+        Some(format!("   {} {}.jpg", date_time_string, file_name))
     }
 }
 
 // Returns a string of the format "yyyy-mm-dd hh;mm;ss" if the image has an exif date, or "" if it doesn't.
-pub fn date_time_string_from_image_path(image_path: &Path) -> String {
+fn date_time_string_from_image_path(image_path: &Path) -> String {
     let file = std::fs::File::open(image_path).unwrap();
     let reader = exif::Reader::new(&mut std::io::BufReader::new(&file));
 
@@ -104,6 +110,25 @@ mod tests {
         for extension in extensions.iter() {
             assert!(!extension_is_destination_file_extension(OsStr::new(extension)));
         }
+    }
+
+    #[test]
+    fn destination_image_name_for_exif_image() {
+        let image_path = PathBuf::from(r"tests/image_with_exif.jpg");
+        let image_name = destination_image_name_from_image_path(&image_path);
+        let correct_image_name = Some(String::from("   2004-04-09 17;33;15 image_with_exif.jpg.jpg"));
+
+        assert_eq!(image_name, correct_image_name);
+    }
+
+    #[test]
+    fn destination_image_name_for_non_exif_image() {
+        let image_path = PathBuf::from(r"tests/image_without_exif.jpg");
+        let image_name = destination_image_name_from_image_path(&image_path);
+
+        let correct_image_name = Some(String::from("image_without_exif.jpg.jpg"));
+
+        assert_eq!(image_name, correct_image_name);
     }
 
     #[test]

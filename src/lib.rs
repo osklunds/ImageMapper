@@ -103,12 +103,15 @@ fn handle_source_file(source_file_path: &Path, destination_path: &Path) {
 }
 
 fn handle_source_image(source_image_path: &Path, destination_path: &Path) {
-    let destination_image_name: String = file_names::destination_image_name_from_image_path(source_image_path);
-    println!("{:?}", destination_image_name);
-    let destination_image_path: PathBuf = destination_path.join(destination_image_name);
+    if let Some(destination_image_name) = file_names::destination_image_name_from_image_path(source_image_path) {
+        println!("{:?}", destination_image_name);
+        let destination_image_path: PathBuf = destination_path.join(destination_image_name);
 
-    if !destination_image_path.exists() {
-        open_compress_and_save_image(source_image_path, &destination_image_path);
+        if !destination_image_path.exists() {
+            open_compress_and_save_image(source_image_path, &destination_image_path);
+        }
+    } else {
+        //TODO
     }
 }
 

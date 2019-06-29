@@ -2,7 +2,6 @@
 #![allow(dead_code, unused_variables, unused_imports)]
 
 extern crate image;
-extern crate exif;
 
 use image::GenericImageView;
 use image::FilterType::Gaussian;
@@ -22,7 +21,7 @@ use std::ffi::OsString;
 
 use std::io;
 
-use exif::Tag;
+mod file_names;
 
 pub fn map_directory(source_path: &Path, destination_path: &Path) {
     println!("Entered src '{:?}' and dst '{:?}'", source_path, destination_path);
@@ -97,14 +96,14 @@ fn handle_source_file(source_file_path: &Path, destination_path: &Path) {
     let extension: Option<&OsStr> = source_file_path.extension();
 
     if let Some(extension) = extension {
-        if extension_is_image_extension(extension) {
+        if file_names::extension_is_image_extension(extension) {
             handle_source_image(source_file_path, destination_path);
         }
     }
 }
 
 fn handle_source_image(source_image_path: &Path, destination_path: &Path) {
-    let destination_image_name: String = destination_image_name_from_image_path(source_image_path);
+    let destination_image_name: String = file_names::destination_image_name_from_image_path(source_image_path);
     println!("{:?}", destination_image_name);
     let destination_image_path: PathBuf = destination_path.join(destination_image_name);
 
@@ -154,7 +153,7 @@ fn handle_destination_file(destination_file_path: &Path, source_path: &Path) {
     let extension = destination_file_path.extension();
 
     if let Some(extension) = extension {
-        if extension_is_destination_file_extension(extension) {
+        if file_names::extension_is_destination_file_extension(extension) {
             handle_destination_image(destination_file_path, source_path);
         } else {
             handle_destination_non_image_file(destination_file_path);
@@ -168,7 +167,7 @@ fn handle_destination_image(destination_image_path: &Path,source_path: &Path) {
     let destination_image_name = destination_image_path.file_name();
 
     if let Some(destination_image_name) = destination_image_name {
-        let corresponding_source_entry_name: String = destination_image_name_to_source_image_name(destination_image_name.to_str().unwrap());
+        let corresponding_source_entry_name: String = file_names::destination_image_name_to_source_image_name(destination_image_name.to_str().unwrap());
         let corresponding_source_entry_path = source_path.join(corresponding_source_entry_name);
 
         if !corresponding_source_entry_path.is_file() {
@@ -188,27 +187,6 @@ fn handle_destination_extensionless_file(destination_file_path: &Path) {
     fs::remove_file(destination_file_path).unwrap();
 }
 
-pub fn extension_is_image_extension(extension: &OsStr) -> bool {
-    let string = extension.to_str().unwrap().to_lowercase();
-
-    match string.as_str() {
-        "jpg" => true,
-        "jpeg" => true,
-        "png" => true,
-        "gif" => true,
-        "nef" => true,
-        "tif" => true,
-        "tiff" => true,
-        _ => false
-    }
-}
-
-pub fn extension_is_destination_file_extension(extension: &OsStr) -> bool {
-    let string = extension.to_str().unwrap().to_lowercase();
-
-    return string.as_str() == "jpg";
-}
-
 pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path) {
     let original = image::open(source_path).unwrap();
     let resized = original.resize(1024, 1024, Gaussian);
@@ -221,68 +199,9 @@ pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path)
     encoder.encode(&pixels, width, height, ColorType::RGB(8)).unwrap();
 }
 
-pub fn destination_image_name_from_image_path(image_path: &Path) -> String {
-    let file_name = image_path.file_name().unwrap();
-    let date_time_string = date_time_string_from_image_path(image_path);
-    if date_time_string.is_empty() {
-        return String::from(file_name.to_str().unwrap());
-    } else {
-        return format!("   {} {}.jpg", date_time_string, file_name.to_str().unwrap());
-    }
-}
-
-// Returns a string of the format "yyyy-mm-dd hh;mm;ss" if the image has an exif date, or "" if it doesn't.
-pub fn date_time_string_from_image_path(image_path: &Path) -> String {
-    let file = std::fs::File::open(image_path).unwrap();
-    let reader = exif::Reader::new(&mut std::io::BufReader::new(&file));
-
-    if let Ok(r) = reader {
-        let date_time = r.get_field(Tag::DateTimeOriginal, false).unwrap();
-        return format!("{}", date_time.value.display_as(Tag::DateTimeOriginal)).replace(":",";");
-    } else {
-        return String::from("");
-    }
-}
-
-pub fn destination_image_name_to_source_image_name(file_name: &str) -> String {
-    let length = file_name.len();
-    if length < 24 {
-        return String::from(file_name);
-    } else {
-        let x = file_name.get(23..(length-4)).unwrap();
-        return x.to_string();
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn date_time_string_is_correct() {
-        let image_path = PathBuf::from(r"tests/test_image.jpg");
-        let date_time_string = date_time_string_from_image_path(&image_path);
-
-        assert_eq!(date_time_string,"2004-04-09 17;33;15");
-    }
-
-    #[test]
-    fn is_image_extension_is_true_for_image_extensions() {
-        let extensions = vec!["jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF", "nef", "NEF", "tif", "TIF", "tiff", "TIFF"];
-
-        for extension in extensions.iter() {
-            assert!(extension_is_image_extension(OsString::from(extension).as_os_str()));
-        }
-    }
-
-    #[test]
-    fn is_image_extension_is_false_for_non_image_extensions() {
-        let extensions = vec!["m4v", "mp4", "mov", "pdf", "doc"];
-
-        for extension in extensions.iter() {
-            assert!(!extension_is_image_extension(OsString::from(extension).as_os_str()));
-        }
-    }
 
     #[test]
     fn test_ensure_path_is_directory_removes_file() {
@@ -318,15 +237,4 @@ mod tests {
 
         assert!(destination_file.as_path().exists());        
     }
-
-    #[test]
-    fn test_destination_file_name_to_file_name() {
-        let destination_path = PathBuf::from(r"tests/test_image.jpg");
-        let destination_file_name = destination_file_name_from_image_path(&destination_path);
-        let file_name = destination_file_name_to_file_name(&destination_file_name);
-        assert_eq!("test_image.jpg", file_name);
-    }
-
-
-
 }

@@ -14,17 +14,19 @@ use std::fs::ReadDir;
 use std::fs::DirEntry;
 
 pub fn extension_is_image_extension(extension: &OsStr) -> bool {
-    let string = extension.to_str().unwrap().to_lowercase();
-
-    match string.as_str() {
-        "jpg" => true,
-        "jpeg" => true,
-        "png" => true,
-        "gif" => true,
-        "nef" => true,
-        "tif" => true,
-        "tiff" => true,
-        _ => false
+    if let Some(extension) = extension.to_str() {
+        match extension.to_lowercase().as_str() {
+            "jpg" => true,
+            "jpeg" => true,
+            "png" => true,
+            "gif" => true,
+            "nef" => true,
+            "tif" => true,
+            "tiff" => true,
+            _ => false
+        }
+    } else {
+        false
     }
 }
 
@@ -33,8 +35,6 @@ pub fn extension_is_destination_file_extension(extension: &OsStr) -> bool {
 
     return string.as_str() == "jpg";
 }
-
-
 
 pub fn destination_image_name_from_image_path(image_path: &Path) -> String {
     let file_name = image_path.file_name().unwrap();
@@ -75,36 +75,52 @@ mod tests {
     use super::*;
 
     #[test]
+    fn extension_is_image_extension_is_true_for_image_extensions() {
+        let extensions = vec!["jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF", "nef", "NEF", "tif", "TIF", "tiff", "TIFF"];
+
+        for extension in extensions.iter() {
+            assert!(extension_is_image_extension(OsStr::new(extension)));
+        }
+    }
+    
+    #[test]
+    fn extension_is_image_extension_is_false_for_non_image_extensions() {
+        let extensions = vec!["m4v", "mp4", "mov", "pdf", "doc"];
+
+        for extension in extensions.iter() {
+            assert!(!extension_is_image_extension(OsStr::new(extension)));
+        }
+    }
+
+    #[test]
+    fn extension_is_destination_file_extension_is_true_for_destination_file_extension() {
+        assert!(extension_is_destination_file_extension(OsStr::new("jpg")));
+    }
+
+    #[test]
+    fn extension_is_destination_file_extension_is_false_for_non_destination_file_extensions() {
+        let extensions = vec!["jpeg", "JPEG", "png", "PNG", "gif", "GIF", "nef", "NEF", "tif", "TIF", "tiff", "TIFF", "m4v", "mp4", "mov", "pdf", "doc"];
+
+        for extension in extensions.iter() {
+            assert!(!extension_is_destination_file_extension(OsStr::new(extension)));
+        }
+    }
+
+/*
+    #[test]
     fn date_time_string_is_correct() {
         let image_path = PathBuf::from(r"tests/test_image.jpg");
         let date_time_string = date_time_string_from_image_path(&image_path);
 
         assert_eq!(date_time_string,"2004-04-09 17;33;15");
     }
-
+    
     #[test]
-    fn is_image_extension_is_true_for_image_extensions() {
-        let extensions = vec!["jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF", "nef", "NEF", "tif", "TIF", "tiff", "TIFF"];
-
-        for extension in extensions.iter() {
-            assert!(extension_is_image_extension(OsString::from(extension).as_os_str()));
-        }
-    }
-
-    #[test]
-    fn is_image_extension_is_false_for_non_image_extensions() {
-        let extensions = vec!["m4v", "mp4", "mov", "pdf", "doc"];
-
-        for extension in extensions.iter() {
-            assert!(!extension_is_image_extension(OsString::from(extension).as_os_str()));
-        }
-    }
-
-        #[test]
     fn test_destination_file_name_to_file_name() {
         let destination_path = PathBuf::from(r"tests/test_image.jpg");
         let destination_file_name = destination_file_name_from_image_path(&destination_path);
         let file_name = destination_file_name_to_file_name(&destination_file_name);
         assert_eq!("test_image.jpg", file_name);
     }
+    */
 }

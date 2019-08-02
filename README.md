@@ -5,6 +5,4 @@ ImageMapper is a command line tool written in Rust for mapping a folder hierarch
 
 ## Credits
 
-https://unsplash.com/photos/f0heeiu-Ec0/
-
-https://se.freeimages.com/photo/wild-flowers-1628445
+The images `testing/images/with-exif.jpg` and `testing/images/without-exif.jpg` were taken by [Johann Siemens](https://unsplash.com/@johannsiemens?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText) and downloaded from [Unsplash](https://unsplash.com/search/photos/tree?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText).

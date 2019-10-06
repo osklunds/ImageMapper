@@ -226,17 +226,17 @@ mod tests {
 
     #[test]
     fn test_ensure_path_is_directory_adds_directory() {
+        clean_testing_directory();
         let destination_path = Path::new("testing/temp/dst");
-
         ensure_path_is_directory(destination_path);
 
         assert!(destination_path.is_dir());
     }
-    /*
+    
     #[test]
     fn test_ensure_path_is_directory_does_not_remove_directory() {
-        let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_does_not_remove_directory");
-        fs::remove_dir_all(destination_path).unwrap();
+        clean_testing_directory();
+        let destination_path = Path::new("testing/temp/dst");
         fs::create_dir(destination_path).unwrap();
 
         let destination_file = destination_path.join("file");
@@ -246,5 +246,4 @@ mod tests {
 
         assert!(destination_file.as_path().exists());        
     }
-    */
 }

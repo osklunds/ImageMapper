@@ -1,13 +1,6 @@
 
 #![allow(dead_code, unused_variables, unused_imports)]
 
-extern crate image;
-
-use image::GenericImageView;
-use image::FilterType::Gaussian;
-use image::jpeg::JPEGEncoder;
-use image::ColorType;
-
 use std::fs::File;
 use std::fs;
 use std::fs::ReadDir;
@@ -22,6 +15,7 @@ use std::ffi::OsString;
 use std::io;
 
 mod file_names;
+mod image;
 
 pub fn map_directory(source_path: &Path, destination_path: &Path) {
     println!("Entered src '{:?}' and dst '{:?}'", source_path, destination_path);
@@ -91,22 +85,20 @@ fn handle_source_dir(source_dir_path: &Path, destination_path: &Path) {
 }
 
 fn handle_source_file(source_file_path: &Path, destination_path: &Path) {
-    let extension: Option<&OsStr> = source_file_path.extension();
+    let extension = source_file_path.extension().expect("Could not get source_file_path extension.");
 
-    if let Some(extension) = extension {
-        if file_names::extension_is_image_extension(extension) {
-            handle_source_image(source_file_path, destination_path);
-        }
+    if file_names::extension_is_image_extension(extension) {
+        handle_source_image(source_file_path, destination_path);
     }
 }
 
 fn handle_source_image(source_image_path: &Path, destination_path: &Path) {
     if let Some(destination_image_name) = file_names::destination_image_name_from_image_path(source_image_path) {
         println!("{:?}", destination_image_name);
-        let destination_image_path: PathBuf = destination_path.join(destination_image_name);
+        let destination_image_path = destination_path.join(destination_image_name);
 
         if !destination_image_path.exists() {
-            open_compress_and_save_image(source_image_path, &destination_image_path);
+            image::open_compress_and_save_image(source_image_path, &destination_image_path);
         }
     } else {
         //TODO
@@ -186,18 +178,6 @@ fn handle_destination_non_image_file(destination_file_path: &Path) {
 
 fn handle_destination_extensionless_file(destination_file_path: &Path) {
     fs::remove_file(destination_file_path).unwrap();
-}
-
-pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path) {
-    let original = image::open(source_path).unwrap();
-    let resized = original.resize(1024, 1024, Gaussian);
-    let width = resized.width();
-    let height = resized.height();
-    let pixels = resized.raw_pixels();
-
-    let mut file = File::create(destination_path).unwrap();
-    let mut encoder = JPEGEncoder::new_with_quality(&mut file, 60);
-    encoder.encode(&pixels, width, height, ColorType::RGB(8)).unwrap();
 }
 
 #[cfg(test)]

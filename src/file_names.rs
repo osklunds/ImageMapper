@@ -1,6 +1,4 @@
 
-extern crate exif;
-
 use exif::Tag;
 
 use std::ffi::OsStr;

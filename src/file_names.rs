@@ -65,13 +65,15 @@ fn date_time_string_from_image_path(image_path: &Path) -> String {
     }
 }
 
-pub fn destination_image_name_to_source_image_name(file_name: &str) -> String {
+pub fn destination_image_name_to_source_image_name(file_name: &str) -> Option<String> {
     let length = file_name.len();
-    if length < 24 {
-        return String::from(file_name);
+    if length >= 24 && file_name.get(0..3) == Some("   ") {
+        let trimmed = file_name.get(23..(length-4)).expect("Could not trim a file name.");
+        return Some(trimmed.to_string());
+    } else if length >= 4 {
+        return Some(file_name.get(0..length-4).expect("Could not trim a file name.").to_string());
     } else {
-        let x = file_name.get(23..(length-4)).unwrap();
-        return x.to_string();
+        return None;
     }
 }
 
@@ -81,7 +83,7 @@ mod tests {
     use super::*;
 
     const TESTING_ROOT_DIRECTORY: &str = "testing";
-    
+
     const IMAGE_WITH_EXIF: &str = "testing/images/with-exif.jpg";
     const IMAGE_WITHOUT_EXIF: &str = "testing/images/without-exif.jpg";
 
@@ -152,13 +154,34 @@ mod tests {
         assert_eq!(date_time_string,"");
     }
     
-    /*
     #[test]
-    fn test_destination_file_name_to_file_name() {
-        let destination_path = PathBuf::from(r"tests/test_image.jpg");
-        let destination_file_name = destination_file_name_from_image_path(&destination_path);
-        let file_name = destination_file_name_to_file_name(&destination_file_name);
-        assert_eq!("test_image.jpg", file_name);
+    fn test_destination_image_name_to_source_image_name_exif() {
+        let destination_image_name = "   2019-02-01 11;22;33 image.png.jpg";
+        let source_image_name = destination_image_name_to_source_image_name(destination_image_name);
+        let expected_source_image_name = Some("image.png".to_string());
+        assert_eq!(source_image_name, expected_source_image_name);
     }
-    */
+
+    #[test]
+    fn test_destination_image_name_to_source_image_name_no_exif() {
+        let destination_image_name = "image.png.jpg";
+        let source_image_name = destination_image_name_to_source_image_name(destination_image_name);
+        let expected_source_image_name = Some("image.png".to_string());
+        assert_eq!(source_image_name, expected_source_image_name);
+    }
+
+    #[test]
+    fn test_destination_image_name_to_source_image_name_no_exif_long_name() {
+        let destination_image_name = "image image image image image image image.png.jpg";
+        let source_image_name = destination_image_name_to_source_image_name(destination_image_name);
+        let expected_source_image_name = Some("image image image image image image image.png".to_string());
+        assert_eq!(source_image_name, expected_source_image_name);
+    }
+
+    #[test]
+    fn test_destination_image_name_to_source_image_name_too_short() {
+        let destination_image_name = "b";
+        let source_image_name = destination_image_name_to_source_image_name(destination_image_name);
+        assert_eq!(source_image_name, None);
+    }
 }

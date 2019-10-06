@@ -170,7 +170,7 @@ fn handle_destination_image(destination_image_path: &Path,source_path: &Path) {
     let destination_image_name = destination_image_path.file_name();
 
     if let Some(destination_image_name) = destination_image_name {
-        let corresponding_source_entry_name: String = file_names::destination_image_name_to_source_image_name(destination_image_name.to_str().unwrap());
+        let corresponding_source_entry_name = file_names::destination_image_name_to_source_image_name(destination_image_name.to_str().unwrap()).unwrap();
         let corresponding_source_entry_path = source_path.join(corresponding_source_entry_name);
 
         if !corresponding_source_entry_path.is_file() {

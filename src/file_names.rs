@@ -82,8 +82,6 @@ pub fn destination_image_name_to_source_image_name(file_name: &str) -> Option<St
 mod tests {
     use super::*;
 
-    const TESTING_ROOT_DIRECTORY: &str = "testing";
-
     const IMAGE_WITH_EXIF: &str = "testing/images/with-exif.jpg";
     const IMAGE_WITHOUT_EXIF: &str = "testing/images/without-exif.jpg";
 

@@ -201,15 +201,17 @@ pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path)
     let mut encoder = JPEGEncoder::new_with_quality(&mut file, 60);
     encoder.encode(&pixels, width, height, ColorType::RGB(8)).unwrap();
 }
-/*
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    const TESTING_ROOT_DIRECTORY: &str = "testing/temp";
+
     #[test]
     fn test_ensure_path_is_directory_removes_file() {
-        let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_removes_file");
-        fs::remove_dir(destination_path).unwrap();
+        clean_testing_directory();
+        let destination_path = Path::new("testing/temp/dst");
         File::create(destination_path).unwrap();
 
         ensure_path_is_directory(destination_path);
@@ -217,6 +219,12 @@ mod tests {
         assert!(destination_path.is_dir());
     }
 
+    fn clean_testing_directory() {
+        fs::remove_dir_all(TESTING_ROOT_DIRECTORY).unwrap();
+        fs::create_dir(TESTING_ROOT_DIRECTORY).unwrap();
+    }
+
+    /*
     #[test]
     fn test_ensure_path_is_directory_adds_directory() {
         let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_adds_directory");
@@ -240,5 +248,5 @@ mod tests {
 
         assert!(destination_file.as_path().exists());        
     }
+    */
 }
-*/

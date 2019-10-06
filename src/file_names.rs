@@ -80,6 +80,11 @@ pub fn destination_image_name_to_source_image_name(file_name: &str) -> String {
 mod tests {
     use super::*;
 
+    const TESTING_ROOT_DIRECTORY: &str = "testing";
+    
+    const IMAGE_WITH_EXIF: &str = "testing/images/with-exif.jpg";
+    const IMAGE_WITHOUT_EXIF: &str = "testing/images/without-exif.jpg";
+
     #[test]
     fn extension_is_image_extension_is_true_for_image_extensions() {
         let extensions = vec!["jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF", "nef", "NEF", "tif", "TIF", "tiff", "TIFF"];
@@ -114,34 +119,34 @@ mod tests {
 
     #[test]
     fn destination_image_name_for_exif_image() {
-        let image_path = PathBuf::from(r"tests/image_with_exif.jpg");
+        let image_path = PathBuf::from(IMAGE_WITH_EXIF);
         let image_name = destination_image_name_from_image_path(&image_path);
-        let correct_image_name = Some(String::from("   2004-04-09 17;33;15 image_with_exif.jpg.jpg"));
+        let correct_image_name = Some(String::from("   2010-03-14 11;22;33 with-exif.jpg.jpg"));
 
         assert_eq!(image_name, correct_image_name);
     }
 
     #[test]
     fn destination_image_name_for_non_exif_image() {
-        let image_path = PathBuf::from(r"tests/image_without_exif.jpg");
+        let image_path = PathBuf::from(IMAGE_WITHOUT_EXIF);
         let image_name = destination_image_name_from_image_path(&image_path);
 
-        let correct_image_name = Some(String::from("image_without_exif.jpg.jpg"));
+        let correct_image_name = Some(String::from("without-exif.jpg.jpg"));
 
         assert_eq!(image_name, correct_image_name);
     }
 
     #[test]
     fn date_time_string_is_correct_for_image_with_exif() {
-        let image_path = PathBuf::from(r"tests/image_with_exif.jpg");
+        let image_path = PathBuf::from(IMAGE_WITH_EXIF);
         let date_time_string = date_time_string_from_image_path(&image_path);
 
-        assert_eq!(date_time_string,"2004-04-09 17;33;15");
+        assert_eq!(date_time_string,"2010-03-14 11;22;33");
     }
 
     #[test]
     fn date_time_string_is_correct_for_image_without_exif() {
-        let image_path = PathBuf::from(r"tests/image_without_exif.jpg");
+        let image_path = PathBuf::from(IMAGE_WITHOUT_EXIF);
         let date_time_string = date_time_string_from_image_path(&image_path);
 
         assert_eq!(date_time_string,"");

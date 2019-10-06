@@ -224,17 +224,15 @@ mod tests {
         fs::create_dir(TESTING_ROOT_DIRECTORY).unwrap();
     }
 
-    /*
     #[test]
     fn test_ensure_path_is_directory_adds_directory() {
-        let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_adds_directory");
-        fs::remove_dir(destination_path).unwrap();
+        let destination_path = Path::new("testing/temp/dst");
 
         ensure_path_is_directory(destination_path);
 
         assert!(destination_path.is_dir());
     }
-
+    /*
     #[test]
     fn test_ensure_path_is_directory_does_not_remove_directory() {
         let destination_path = Path::new("tests/test_ensure_destination_path_is_directory_does_not_remove_directory");

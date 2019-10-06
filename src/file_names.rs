@@ -39,14 +39,14 @@ pub fn extension_is_destination_file_extension(extension: &OsStr) -> bool {
     }
 }
 
-pub fn destination_image_name_from_image_path(image_path: &Path) -> Option<String> {
-    let file_name = image_path.file_name()?.to_str()?;
+pub fn destination_image_name_from_image_path(image_path: &Path) -> String {
+    let file_name = image_path.file_name().expect("Could not get the file_name.").to_str().expect("Could not convert file_name to str.");
     let date_time_string = date_time_string_from_image_path(image_path);
 
     if date_time_string.is_empty() {
-        Some(format!("{}.jpg", file_name))
+        format!("{}.jpg", file_name)
     } else {
-        Some(format!("   {} {}.jpg", date_time_string, file_name))
+        format!("   {} {}.jpg", date_time_string, file_name)
     }
 }
 
@@ -119,7 +119,7 @@ mod tests {
     fn destination_image_name_for_exif_image() {
         let image_path = PathBuf::from(IMAGE_WITH_EXIF);
         let image_name = destination_image_name_from_image_path(&image_path);
-        let correct_image_name = Some(String::from("   2010-03-14 11;22;33 with-exif.jpg.jpg"));
+        let correct_image_name = "   2010-03-14 11;22;33 with-exif.jpg.jpg".to_string();
 
         assert_eq!(image_name, correct_image_name);
     }
@@ -129,7 +129,7 @@ mod tests {
         let image_path = PathBuf::from(IMAGE_WITHOUT_EXIF);
         let image_name = destination_image_name_from_image_path(&image_path);
 
-        let correct_image_name = Some(String::from("without-exif.jpg.jpg"));
+        let correct_image_name = "without-exif.jpg.jpg".to_string();
 
         assert_eq!(image_name, correct_image_name);
     }

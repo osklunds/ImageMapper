@@ -85,11 +85,11 @@ fn handle_source_dir(source_dir_path: &Path, destination_path: &Path) {
 }
 
 fn handle_source_file(source_file_path: &Path, destination_path: &Path) {
-    let extension = source_file_path.extension().expect("Could not get source_file_path extension.");
-
-    if file_names::extension_is_image_extension(extension) {
+    if let Some(extension) = source_file_path.extension() {
         handle_source_image(source_file_path, destination_path);
     }
+    // Some files don't have extensions, so if one is missing, it's
+    // not an image, so ignore it.
 }
 
 fn handle_source_image(source_image_path: &Path, destination_path: &Path) {
@@ -114,8 +114,7 @@ fn iterate_destination_entries(source_path: &Path, destination_path: &Path) {
             None     => return ()
         };
 
-        let destination_entry_path_buf = destination_entry.path();
-        let destination_entry_path = &destination_entry_path_buf;
+        let destination_entry_path = &destination_entry.path();
 
         if destination_entry_path.is_dir() {
             handle_destination_dir(destination_entry_path, source_path);
@@ -126,23 +125,19 @@ fn iterate_destination_entries(source_path: &Path, destination_path: &Path) {
 }
 
 fn handle_destination_dir(destination_dir_path: &Path, source_path: &Path) {
-    let destination_dir_name = destination_dir_path.file_name();
+    let destination_dir_name = destination_dir_path.file_name().expect("Could not get a file_name.");
+    let corresponding_source_entry_path = source_path.join(destination_dir_name);
 
-    if let Some(destination_dir_name) = destination_dir_name {
-        let corresponding_source_entry_path = source_path.join(destination_dir_name);
-
-        if !corresponding_source_entry_path.is_dir() {
-            fs::remove_dir_all(destination_dir_path).unwrap();
-        }
-    } else {
-        //TODO
+    if !corresponding_source_entry_path.is_dir() {
+        fs::remove_dir_all(destination_dir_path).unwrap();
     }
+    // No need to recursively call map_directory. If a destination dir
+    // has a name that matches the source dir, then it will already have
+    // been iterated in the source phase.
 }
 
 fn handle_destination_file(destination_file_path: &Path, source_path: &Path) {
-    let extension = destination_file_path.extension();
-
-    if let Some(extension) = extension {
+    if let Some(extension) = destination_file_path.extension() {
         if file_names::extension_is_destination_file_extension(extension) {
             handle_destination_image(destination_file_path, source_path);
         } else {
@@ -153,28 +148,28 @@ fn handle_destination_file(destination_file_path: &Path, source_path: &Path) {
     }
 }
 
-fn handle_destination_image(destination_image_path: &Path,source_path: &Path) {
-    let destination_image_name = destination_image_path.file_name();
-
-    if let Some(destination_image_name) = destination_image_name {
-        let corresponding_source_entry_name = file_names::destination_image_name_to_source_image_name(destination_image_name.to_str().unwrap()).unwrap();
+fn handle_destination_image(destination_image_path: &Path, source_path: &Path) {
+    let destination_image_name = destination_image_path.file_name().expect("Could not get a file name.").to_str().expect("Could not convert to str.");
+    if let Some(corresponding_source_entry_name) = file_names::destination_image_name_to_source_image_name(destination_image_name) {
         let corresponding_source_entry_path = source_path.join(corresponding_source_entry_name);
 
+        // The corresponding source entry must be a file, otherwise
+        // it doesn't exist or is a dir.
         if !corresponding_source_entry_path.is_file() {
             fs::remove_file(destination_image_path).unwrap();
         }
-
     } else {
-        //TODO
-    }
+        // Some weird file_name that is very short. For sure invalid.
+        fs::remove_file(destination_image_path).expect("Could not remove a file.");
+    }    
 }
 
 fn handle_destination_non_image_file(destination_file_path: &Path) {
-    fs::remove_file(destination_file_path).unwrap();
+    fs::remove_file(destination_file_path).expect("Could not remove a file.");
 }
 
 fn handle_destination_extensionless_file(destination_file_path: &Path) {
-    fs::remove_file(destination_file_path).unwrap();
+    fs::remove_file(destination_file_path).expect("Could not remove a file.");
 }
 
 #[cfg(test)]

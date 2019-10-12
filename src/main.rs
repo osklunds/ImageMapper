@@ -9,8 +9,8 @@ use std::path::PathBuf;
 
 fn main() {
     
-    let src = PathBuf::from(r"from");
-    let dst = PathBuf::from(r"to");
+    let src = PathBuf::from("testing/from");
+    let dst = PathBuf::from("testing/to");
 
     image_mapper::map_directory(&src, &dst);
     

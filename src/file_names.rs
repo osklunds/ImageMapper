@@ -80,8 +80,8 @@ pub fn destination_image_name_to_source_image_name(file_name: &str) -> Option<St
 mod tests {
     use super::*;
 
-    const IMAGE_WITH_EXIF: &str = "testing/images/with-exif.jpg";
-    const IMAGE_WITHOUT_EXIF: &str = "testing/images/without-exif.jpg";
+    const IMAGE_WITH_EXIF: &str = "test_resources/large-with-exif.jpg";
+    const IMAGE_WITHOUT_EXIF: &str = "test_resources/large-without-exif.jpg";
 
     #[test]
     fn extension_is_image_extension_is_true_for_image_extensions() {
@@ -119,7 +119,7 @@ mod tests {
     fn destination_image_name_for_exif_image() {
         let image_path = PathBuf::from(IMAGE_WITH_EXIF);
         let image_name = destination_image_name_from_image_path(&image_path);
-        let correct_image_name = "   2010-03-14 11;22;33 with-exif.jpg.jpg".to_string();
+        let correct_image_name = "   2010-03-14 11;22;33 large-with-exif.jpg.jpg".to_string();
 
         assert_eq!(image_name, correct_image_name);
     }
@@ -129,7 +129,7 @@ mod tests {
         let image_path = PathBuf::from(IMAGE_WITHOUT_EXIF);
         let image_name = destination_image_name_from_image_path(&image_path);
 
-        let correct_image_name = "without-exif.jpg.jpg".to_string();
+        let correct_image_name = "large-without-exif.jpg.jpg".to_string();
 
         assert_eq!(image_name, correct_image_name);
     }

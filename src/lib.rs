@@ -98,7 +98,9 @@ fn handle_source_image(source_image_path: &Path, destination_path: &Path) {
     let destination_image_path = destination_path.join(destination_image_name);
 
     if !destination_image_path.exists() {
+        println!("Create");
         image::open_compress_and_save_image(source_image_path, &destination_image_path);
+
     }
 }
 

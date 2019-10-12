@@ -36,21 +36,6 @@ fn test_ensure_path_is_directory_does_not_remove_directory() {
     assert!(destination_file.exists());        
 }
 
-#[test]
-fn test_that_map_directory_creates_the_correct_dst_structure() {
-    let src_dir = tempfile::tempdir().unwrap();
-    let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
-    let dst_path = &dst_dir.path();
-    create_src_structure_in_dir(src_path);
-
-    map_directory(src_path, dst_path);
-
-
-
-
-}
-
 /*
 dir_path
     dir1
@@ -127,8 +112,46 @@ fn create_subdir2_in_dir(dir_path: &Path) {
 const SMALL_WITH_EXIF_JPG_NAME: &str = "small-with-exif.jpg";
 const SMALL_WITH_EXIF_JPG_PATH: &str = "test_resources/small-with-exif.jpg";
 
+
 const SMALL_WITHOUT_EXIF_JPG_NAME: &str = "small-without-exif.jpg";
 const SMALL_WITHOUT_EXIF_JPG_PATH: &str = "test_resources/small-without-exif.jpg";
 
 const SMALL_WITHOUT_EXIF_PNG_NAME: &str = "small-without-exif.png";
 const SMALL_WITHOUT_EXIF_PNG_PATH: &str = "test_resources/small-without-exif.png";
+
+#[test]
+fn test_that_map_directory_creates_the_correct_dst_structure() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory(src_path, dst_path);
+
+    check_dir1(dst_path);
+    check_dir2(dst_path);
+
+    assert!(dst_path.join("dir3").exists());
+    assert!(dst_path.join(SMALL_WITH_EXIF_DST_NAME).exists());
+    assert!(dst_path.join("small-without-exif.jpg.jpg").exists());
+    assert!(dst_path.join("small-without-exif.png.jpg").exists());
+}
+
+fn check_dir1(dst_path: &Path) {
+    assert!(dst_path.join("dir1").exists());
+    assert!(dst_path.join("dir1").join(SMALL_WITH_EXIF_DST_NAME).exists());
+}
+
+const SMALL_WITH_EXIF_DST_NAME: &str = "   2010-03-14 11;22;33 small-with-exif.jpg.jpg";
+
+fn check_dir2(dst_path: &Path) {
+    assert!(dst_path.join("dir2").exists());
+
+    assert!(dst_path.join("dir2").join("subdir1").exists());
+    assert!(dst_path.join("dir2").join("subdir1").join(SMALL_WITH_EXIF_DST_NAME).exists());
+
+    assert!(dst_path.join("dir2").join("subdir2").exists());
+
+    assert!(dst_path.join("dir2").join(SMALL_WITH_EXIF_DST_NAME).exists());
+}

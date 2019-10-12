@@ -22,7 +22,7 @@ mod tests;
 
 
 pub fn map_directory(source_path: &Path, destination_path: &Path) {
-    println!("Entered src '{:?}' and dst '{:?}'", source_path, destination_path);
+    //println!("Entered src '{:?}' and dst '{:?}'", source_path, destination_path);
 
     ensure_path_is_directory(destination_path);
 

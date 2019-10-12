@@ -219,3 +219,23 @@ fn test_map_directory_removes_non_existant_src_file() {
 
     check_that_dst_structure_is_correct(dst_path);
 }
+
+#[test]
+fn test_map_directory_does_not_remove_correct_exif_image_in_dst() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory(src_path, dst_path);
+    
+    let file_path = &dst_path.join(SMALL_WITH_EXIF_DST_NAME);
+    fs::remove_file(file_path).unwrap();
+    fs::write(file_path, "some text").unwrap();
+
+    map_directory(src_path, dst_path);
+
+    let recovered = fs::read_to_string(file_path).unwrap();
+    assert_eq!(recovered, "some text");
+}

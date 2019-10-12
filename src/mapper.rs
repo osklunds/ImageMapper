@@ -178,7 +178,7 @@ fn handle_destination_video(destination_video_path: &Path, source_path: &Path) {
     let corresponding_source_entry_path = source_path.join(destination_video_name);
 
     // The corresponding source entry must be a file, otherwise
-        // it doesn't exist or is a dir.
+    // it doesn't exist or is a dir.
     if !corresponding_source_entry_path.is_file() {
            fs::remove_file(destination_video_path).unwrap();
     }

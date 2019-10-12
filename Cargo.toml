@@ -5,5 +5,6 @@ authors = ["Oskar Lundström <21679735+osklunds@users.noreply.github.com>"]
 edition = "2018"
 
 [dependencies]
-image = "0.21.2"
+image = "0.22.3"
 kamadak-exif = "0.3.1"
+tempfile = "3.1.0"

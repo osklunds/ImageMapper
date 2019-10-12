@@ -178,6 +178,24 @@ fn handle_destination_extensionless_file(destination_file_path: &Path) {
 mod tests {
     use super::*;
 
+    #[test]
+    fn test_ensure_path_is_directory_removes_file() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        let destination_path = &temp_dir.path().join("dst");
+        File::create(destination_path).unwrap();
+
+        ensure_path_is_directory(destination_path);
+
+        assert!(destination_path.is_dir());
+    }
+
+
+
+
+
+
+    /*
     const TESTING_ROOT_DIRECTORY: &str = "testing/temp";
 
     #[test]
@@ -218,4 +236,5 @@ mod tests {
 
         assert!(destination_file.as_path().exists());        
     }
+    */
 }

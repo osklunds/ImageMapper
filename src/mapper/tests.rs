@@ -122,7 +122,7 @@ const SMALL_WITHOUT_EXIF_PNG_NAME: &str = "small-without-exif.png";
 const SMALL_WITHOUT_EXIF_PNG_PATH: &str = "test_resources/small-without-exif.png";
 
 #[test]
-fn test_map_directory_empty_dst() {
+fn test_map_directory_correctly_fills_empty_dst() {
     let src_dir = tempfile::tempdir().unwrap();
     let src_path = &src_dir.path();
     let dst_dir = tempfile::tempdir().unwrap();
@@ -143,8 +143,9 @@ fn check_that_dst_structure_is_correct(dst_path: &Path) {
     assert!(dst_path.join(SMALL_WITH_EXIF_DST_NAME).exists());
     assert!(dst_path.join("small-without-exif.jpg.jpg").exists());
     assert!(dst_path.join("small-without-exif.png.jpg").exists());
+    assert!(dst_path.join("video.m4v").exists());
 
-    assert_eq!(fs::read_dir(dst_path).unwrap().count(), 6);
+    assert_eq!(fs::read_dir(dst_path).unwrap().count(), 7);
 }
 
 fn check_dir1(dst_path: &Path) {

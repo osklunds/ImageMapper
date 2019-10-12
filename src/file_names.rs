@@ -56,11 +56,11 @@ fn date_time_string_from_image_path(image_path: &Path) -> String {
     let reader = exif::Reader::new(&mut std::io::BufReader::new(&file));
 
     if let Ok(r) = reader {
-        let date_time = r.get_field(Tag::DateTimeOriginal, false).unwrap();
-        return format!("{}", date_time.value.display_as(Tag::DateTimeOriginal)).replace(":",";");
-    } else {
-        return String::from("");
+        if let Some(date_time) = r.get_field(Tag::DateTimeOriginal, false) {
+            return format!("{}", date_time.value.display_as(Tag::DateTimeOriginal)).replace(":",";");
+        }
     }
+    "".to_string()
 }
 
 pub fn destination_image_name_to_source_image_name(file_name: &str) -> Option<String> {

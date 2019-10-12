@@ -68,18 +68,18 @@ dir_path
     word.docx
     video.m4v
 */
-fn create_src_structure_in_dir(dir_path: &Path) {    
+fn create_src_structure_in_dir(dir_path: &Path) {
     create_dir1_in_dir(dir_path);
     create_dir2_in_dir(dir_path);
 
     create_dir_with_name_in_dir("dir3", dir_path);
     create_small_image_with_exif_in_dir(dir_path);
-
+    
     let small_without_exif_jpg_path = dir_path.join(SMALL_WITHOUT_EXIF_JPG_NAME);
-    //fs::copy(SMALL_WITHOUT_EXIF_JPG_PATH, small_without_exif_jpg_path).unwrap();
+    fs::copy(SMALL_WITHOUT_EXIF_JPG_PATH, small_without_exif_jpg_path).unwrap();
 
     let small_without_exif_png_path = dir_path.join(SMALL_WITHOUT_EXIF_PNG_NAME);
-    //fs::copy(SMALL_WITHOUT_EXIF_PNG_PATH, small_without_exif_png_path).unwrap();
+    fs::copy(SMALL_WITHOUT_EXIF_PNG_PATH, small_without_exif_png_path).unwrap();
 
     let text_file_path = dir_path.join("text_file.txt");
     File::create(text_file_path).unwrap();

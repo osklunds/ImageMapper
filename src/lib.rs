@@ -181,7 +181,6 @@ mod tests {
     #[test]
     fn test_ensure_path_is_directory_removes_file() {
         let temp_dir = tempfile::tempdir().unwrap();
-
         let destination_path = &temp_dir.path().join("dst");
         File::create(destination_path).unwrap();
 
@@ -190,34 +189,11 @@ mod tests {
         assert!(destination_path.is_dir());
     }
 
-
-
-
-
-
-    /*
-    const TESTING_ROOT_DIRECTORY: &str = "testing/temp";
-
-    #[test]
-    fn test_ensure_path_is_directory_removes_file() {
-        clean_testing_directory();
-        let destination_path = Path::new("testing/temp/dst");
-        File::create(destination_path).unwrap();
-
-        ensure_path_is_directory(destination_path);
-
-        assert!(destination_path.is_dir());
-    }
-
-    fn clean_testing_directory() {
-        fs::remove_dir_all(TESTING_ROOT_DIRECTORY).unwrap();
-        fs::create_dir(TESTING_ROOT_DIRECTORY).unwrap();
-    }
-
     #[test]
     fn test_ensure_path_is_directory_adds_directory() {
-        clean_testing_directory();
-        let destination_path = Path::new("testing/temp/dst");
+        let temp_dir = tempfile::tempdir().unwrap();
+        let destination_path = &temp_dir.path().join("dst");
+        
         ensure_path_is_directory(destination_path);
 
         assert!(destination_path.is_dir());
@@ -225,16 +201,15 @@ mod tests {
     
     #[test]
     fn test_ensure_path_is_directory_does_not_remove_directory() {
-        clean_testing_directory();
-        let destination_path = Path::new("testing/temp/dst");
+        let temp_dir = tempfile::tempdir().unwrap();
+        let destination_path = &temp_dir.path().join("dst");
+        
         fs::create_dir(destination_path).unwrap();
-
-        let destination_file = destination_path.join("file");
-        File::create(destination_file.as_path()).unwrap();
+        let destination_file = &destination_path.join("file");
+        File::create(destination_file).unwrap();
 
         ensure_path_is_directory(destination_path);
 
-        assert!(destination_file.as_path().exists());        
+        assert!(destination_file.exists());        
     }
-    */
 }

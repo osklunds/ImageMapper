@@ -38,7 +38,17 @@ fn test_ensure_path_is_directory_does_not_remove_directory() {
 
 #[test]
 fn test_that_map_directory_creates_the_correct_dst_structure() {
-    
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory(src_path, dst_path);
+
+
+
+
 }
 
 /*
@@ -56,9 +66,9 @@ dir_path
     small-without-exif.png
     text_file.txt
     word.docx
-    movie.m4v
+    video.m4v
 */
-fn create_src_structure_in_dir(dir_path: &Path) {
+fn create_src_structure_in_dir(dir_path: &Path) {    
     create_dir1_in_dir(dir_path);
     create_dir2_in_dir(dir_path);
 
@@ -66,10 +76,10 @@ fn create_src_structure_in_dir(dir_path: &Path) {
     create_small_image_with_exif_in_dir(dir_path);
 
     let small_without_exif_jpg_path = dir_path.join(SMALL_WITHOUT_EXIF_JPG_NAME);
-    fs::copy(SMALL_WITHOUT_EXIF_JPG_PATH, small_without_exif_jpg_path).unwrap();
+    //fs::copy(SMALL_WITHOUT_EXIF_JPG_PATH, small_without_exif_jpg_path).unwrap();
 
     let small_without_exif_png_path = dir_path.join(SMALL_WITHOUT_EXIF_PNG_NAME);
-    fs::copy(SMALL_WITHOUT_EXIF_PNG_PATH, small_without_exif_png_path).unwrap();
+    //fs::copy(SMALL_WITHOUT_EXIF_PNG_PATH, small_without_exif_png_path).unwrap();
 
     let text_file_path = dir_path.join("text_file.txt");
     File::create(text_file_path).unwrap();
@@ -77,7 +87,7 @@ fn create_src_structure_in_dir(dir_path: &Path) {
     let word_path = dir_path.join("word.docx");
     File::create(word_path).unwrap();
 
-    let movie_path = dir_path.join("movie.m4v");
+    let movie_path = dir_path.join("video.m4v");
     File::create(movie_path).unwrap();
 }
 

@@ -90,7 +90,10 @@ fn handle_source_dir(source_dir_path: &Path, destination_path: &Path) {
 
 fn handle_source_file(source_file_path: &Path, destination_path: &Path) {
     if let Some(extension) = source_file_path.extension() {
-        handle_source_image(source_file_path, destination_path);
+        if file_names::extension_is_image_extension(extension) {
+            handle_source_image(source_file_path, destination_path);
+        }
+        // TODO: video
     }
     // Some files don't have extensions, so if one is missing, it's
     // not an image, so ignore it.

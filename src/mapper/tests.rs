@@ -131,27 +131,57 @@ fn test_that_map_directory_creates_the_correct_dst_structure() {
 
     check_dir1(dst_path);
     check_dir2(dst_path);
+    check_dir3(dst_path);
 
     assert!(dst_path.join("dir3").exists());
     assert!(dst_path.join(SMALL_WITH_EXIF_DST_NAME).exists());
     assert!(dst_path.join("small-without-exif.jpg.jpg").exists());
     assert!(dst_path.join("small-without-exif.png.jpg").exists());
+
+    assert_eq!(fs::read_dir(dst_path).unwrap().count(), 6);
 }
 
 fn check_dir1(dst_path: &Path) {
-    assert!(dst_path.join("dir1").exists());
-    assert!(dst_path.join("dir1").join(SMALL_WITH_EXIF_DST_NAME).exists());
+    let dir1_path = &dst_path.join("dir1");
+    assert!(dir1_path.exists());
+
+    assert!(dir1_path.join(SMALL_WITH_EXIF_DST_NAME).exists());
+
+    assert_eq!(fs::read_dir(dir1_path).unwrap().count(), 1);
 }
 
 const SMALL_WITH_EXIF_DST_NAME: &str = "   2010-03-14 11;22;33 small-with-exif.jpg.jpg";
 
 fn check_dir2(dst_path: &Path) {
-    assert!(dst_path.join("dir2").exists());
-
-    assert!(dst_path.join("dir2").join("subdir1").exists());
-    assert!(dst_path.join("dir2").join("subdir1").join(SMALL_WITH_EXIF_DST_NAME).exists());
-
-    assert!(dst_path.join("dir2").join("subdir2").exists());
-
+    let dir2_path = dst_path.join("dir2");
+    assert!(dir2_path.exists());
+    
+    check_subdir1(&dir2_path);
+    check_subdir2(&dir2_path);
     assert!(dst_path.join("dir2").join(SMALL_WITH_EXIF_DST_NAME).exists());
+
+    assert_eq!(fs::read_dir(dir2_path).unwrap().count(), 3);
+}
+
+fn check_subdir1(dir2_path: &Path) {
+    let subdir1_path = dir2_path.join("subdir1");
+
+    assert!(subdir1_path.exists());
+    assert!(subdir1_path.join(SMALL_WITH_EXIF_DST_NAME).exists());
+
+    assert_eq!(fs::read_dir(subdir1_path).unwrap().count(), 1);
+}
+
+fn check_subdir2(dir2_path: &Path) {
+    let subdir2_path = dir2_path.join("subdir2");
+    assert!(subdir2_path.exists());
+
+    assert_eq!(fs::read_dir(subdir2_path).unwrap().count(), 0);
+}
+
+fn check_dir3(dst_path: &Path) {
+    let dir3_path = dst_path.join("dir3");
+    assert!(dir3_path.exists());
+
+    assert_eq!(fs::read_dir(dir3_path).unwrap().count(), 0);
 }

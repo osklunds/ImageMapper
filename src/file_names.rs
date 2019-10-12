@@ -1,15 +1,8 @@
 
-use exif::Tag;
-
 use std::ffi::OsStr;
-use std::ffi::OsString;
-use std::path::PathBuf;
 use std::path::Path;
 
-use std::fs::File;
-use std::fs;
-use std::fs::ReadDir;
-use std::fs::DirEntry;
+use exif::Tag;
 
 pub fn extension_is_image_extension(extension: &OsStr) -> bool {
     if let Some(extension) = extension.to_str() {

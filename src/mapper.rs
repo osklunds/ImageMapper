@@ -1,17 +1,8 @@
 
-#![allow(dead_code, unused_variables, unused_imports)]
-
-use std::fs::File;
 use std::fs;
 use std::fs::ReadDir;
 use std::fs::DirEntry;
-
-use std::path::PathBuf;
 use std::path::Path;
-
-use std::ffi::OsStr;
-use std::ffi::OsString;
-
 use std::io;
 
 use crate::file_names;
@@ -19,7 +10,6 @@ use crate::image;
 
 #[cfg(test)]
 mod tests;
-
 
 pub fn map_directory(source_path: &Path, destination_path: &Path) {
     //println!("Entered src '{:?}' and dst '{:?}'", source_path, destination_path);

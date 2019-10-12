@@ -1,5 +1,5 @@
 
-use std::fs::{self, File};
+use std::fs::File;
 use std::path::Path;
 
 use image::GenericImageView;

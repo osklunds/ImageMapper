@@ -83,10 +83,12 @@ fn handle_source_file(source_file_path: &Path, destination_path: &Path) {
         if file_names::extension_is_image_extension(extension) {
             handle_source_image(source_file_path, destination_path);
         }
-        // TODO: video
+        else if file_names::extension_is_video_extension(extension) {
+            handle_source_video(source_file_path, destination_path);
+        }
     }
     // Some files don't have extensions, so if one is missing, it's
-    // not an image, so ignore it.
+    // not an image or a video, so ignore it.
 }
 
 fn handle_source_image(source_image_path: &Path, destination_path: &Path) {
@@ -95,6 +97,15 @@ fn handle_source_image(source_image_path: &Path, destination_path: &Path) {
 
     if !destination_image_path.exists() {
         image::open_compress_and_save_image(source_image_path, &destination_image_path);
+    }
+}
+
+fn handle_source_video(source_video_path: &Path, destination_path: &Path) {
+    let destination_video_name = source_video_path.file_name().expect("Could not get file name for a video.");
+    let destination_video_path = destination_path.join(destination_video_name);
+
+    if !destination_video_path.exists() {
+        fs::copy(source_video_path, destination_video_path).expect("Could not copy a video.");
     }
 }
 
@@ -136,8 +147,10 @@ fn handle_destination_file(destination_file_path: &Path, source_path: &Path) {
     if let Some(extension) = destination_file_path.extension() {
         if file_names::extension_is_destination_image_extension(extension) {
             handle_destination_image(destination_file_path, source_path);
+        } else if file_names::extension_is_video_extension(extension) {
+            handle_destination_video(destination_file_path, source_path);
         } else {
-            handle_destination_non_image_file(destination_file_path);
+            handle_destination_other_file(destination_file_path);
         }
     } else {
         handle_destination_extensionless_file(destination_file_path);
@@ -160,7 +173,18 @@ fn handle_destination_image(destination_image_path: &Path, source_path: &Path) {
     }    
 }
 
-fn handle_destination_non_image_file(destination_file_path: &Path) {
+fn handle_destination_video(destination_video_path: &Path, source_path: &Path) {
+    let destination_video_name = destination_video_path.file_name().expect("Could not get a file name.").to_str().expect("Could not convert to str.");
+    let corresponding_source_entry_path = source_path.join(destination_video_name);
+
+    // The corresponding source entry must be a file, otherwise
+        // it doesn't exist or is a dir.
+    if !corresponding_source_entry_path.is_file() {
+           fs::remove_file(destination_video_path).unwrap();
+    }
+}
+
+fn handle_destination_other_file(destination_file_path: &Path) {
     fs::remove_file(destination_file_path).expect("Could not remove a file.");
 }
 

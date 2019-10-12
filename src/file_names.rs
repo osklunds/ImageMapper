@@ -21,7 +21,23 @@ pub fn extension_is_image_extension(extension: &OsStr) -> bool {
     }
 }
 
-pub fn extension_is_destination_file_extension(extension: &OsStr) -> bool {
+pub fn extension_is_video_extension(extension: &OsStr) -> bool {
+    if let Some(extension) = extension.to_str() {
+        match extension.to_lowercase().as_str() {
+            "mov" => true,
+            "avi" => true,
+            "mp4" => true,
+            "m4v" => true,
+            "mpg" => true,
+            "mpeg" => true,
+            _ => false
+        }
+    } else {
+        false
+    }
+}
+
+pub fn extension_is_destination_image_extension(extension: &OsStr) -> bool {
     if let Some(extension) = extension.to_str() {
         match extension.to_lowercase().as_str() {
             "jpg" => true,
@@ -72,6 +88,7 @@ pub fn destination_image_name_to_source_image_name(file_name: &str) -> Option<St
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::PathBuf;
 
     const IMAGE_WITH_EXIF: &str = "test_resources/large-with-exif.jpg";
     const IMAGE_WITHOUT_EXIF: &str = "test_resources/large-without-exif.jpg";
@@ -95,16 +112,34 @@ mod tests {
     }
 
     #[test]
-    fn extension_is_destination_file_extension_is_true_for_destination_file_extension() {
-        assert!(extension_is_destination_file_extension(OsStr::new("jpg")));
+    fn extension_is_destination_image_extension_is_true_for_destination_image_extension() {
+        assert!(extension_is_destination_image_extension(OsStr::new("jpg")));
     }
 
     #[test]
-    fn extension_is_destination_file_extension_is_false_for_non_destination_file_extensions() {
+    fn extension_is_destination_image_extension_is_false_for_non_destination_file_extensions() {
         let extensions = vec!["jpeg", "JPEG", "png", "PNG", "gif", "GIF", "nef", "NEF", "tif", "TIF", "tiff", "TIFF", "m4v", "mp4", "mov", "pdf", "doc"];
 
         for extension in extensions.iter() {
-            assert!(!extension_is_destination_file_extension(OsStr::new(extension)));
+            assert!(!extension_is_destination_image_extension(OsStr::new(extension)));
+        }
+    }
+
+    #[test]
+    fn extension_is_video_extension_is_true_for_video_extensions() {
+        let extensions = vec!["m4v", "M4V", "mp4", "MP4", "mov", "MOV", "mpg", "MPG", "mpeg", "MPEG", "avi", "AVI"];
+
+        for extension in extensions.iter() {
+            assert!(extension_is_video_extension(OsStr::new(extension)));
+        }
+    }
+
+    #[test]
+    fn extension_is_video_extension_is_false_for_non_video_extensions() {
+        let extensions = vec!["jpg", "doc", "pdf", "png"];
+
+        for extension in extensions.iter() {
+            assert!(!extension_is_video_extension(OsStr::new(extension)));
         }
     }
 

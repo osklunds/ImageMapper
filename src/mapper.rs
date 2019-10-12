@@ -134,7 +134,7 @@ fn handle_destination_dir(destination_dir_path: &Path, source_path: &Path) {
 
 fn handle_destination_file(destination_file_path: &Path, source_path: &Path) {
     if let Some(extension) = destination_file_path.extension() {
-        if file_names::extension_is_destination_file_extension(extension) {
+        if file_names::extension_is_destination_image_extension(extension) {
             handle_destination_image(destination_file_path, source_path);
         } else {
             handle_destination_non_image_file(destination_file_path);

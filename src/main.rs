@@ -1,4 +1,6 @@
 
+#![allow(dead_code, unused_variables, unused_imports)]
+
 use std::path::PathBuf;
 
 mod file_names;

@@ -22,5 +22,6 @@ pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path)
 
 #[cfg(test)]
 pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path) {
+    use std::fs;
     fs::copy(source_path, destination_path).unwrap();
 }

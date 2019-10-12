@@ -1,5 +1,7 @@
 
 use super::*;
+use std::fs::File;
+use std::path::PathBuf;
 
 #[test]
 fn test_ensure_path_is_directory_removes_file() {

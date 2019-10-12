@@ -277,3 +277,28 @@ fn test_map_directory_does_not_remove_correct_image_in_dst() {
     let recovered = fs::read_to_string(file_path).unwrap();
     assert_eq!(recovered, "some text");
 }
+
+#[test]
+fn test_map_directory_does_not_remove_correct_video_in_dst() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory(src_path, dst_path);
+    
+    let file_path = &dst_path.join("video.m4v");
+    fs::remove_file(file_path).unwrap();
+    fs::write(file_path, "some text").unwrap();
+
+    map_directory(src_path, dst_path);
+
+    let recovered = fs::read_to_string(file_path).unwrap();
+    assert_eq!(recovered, "some text");
+}
+
+
+
+
+// Add mssing

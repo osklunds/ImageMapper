@@ -239,6 +239,66 @@ fn test_map_directory_removes_non_existant_src_dir() {
 }
 
 #[test]
+fn test_map_directory_removes_non_existant_src_image_double_extension() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory(src_path, dst_path);
+    File::create(dst_path.join("does not exist.jpg.jpg")).unwrap();
+    map_directory(src_path, dst_path);
+
+    check_that_dst_structure_is_correct(dst_path);
+}
+
+#[test]
+fn test_map_directory_removes_non_existant_src_image_single_extension() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory(src_path, dst_path);
+    File::create(dst_path.join("does not exist.jpg")).unwrap();
+    map_directory(src_path, dst_path);
+
+    check_that_dst_structure_is_correct(dst_path);
+}
+
+#[test]
+fn test_map_directory_removes_non_existant_src_video() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory(src_path, dst_path);
+    File::create(dst_path.join("does not exist.m4v")).unwrap();
+    map_directory(src_path, dst_path);
+
+    check_that_dst_structure_is_correct(dst_path);
+}
+
+#[test]
+fn test_map_directory_removes_non_existant_src_image_exif() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory(src_path, dst_path);
+    File::create(dst_path.join("   2001-01-01 11;22;33 does not exist.jpg.jpg")).unwrap();
+    map_directory(src_path, dst_path);
+
+    check_that_dst_structure_is_correct(dst_path);
+}
+
+#[test]
 fn test_map_directory_does_not_remove_correct_exif_image_in_dst() {
     let src_dir = tempfile::tempdir().unwrap();
     let src_path = &src_dir.path();
@@ -302,3 +362,4 @@ fn test_map_directory_does_not_remove_correct_video_in_dst() {
 
 
 // Add mssing
+// Remove incorrect video

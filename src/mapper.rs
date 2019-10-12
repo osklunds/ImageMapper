@@ -14,8 +14,9 @@ use std::ffi::OsString;
 
 use std::io;
 
-mod file_names;
-mod image;
+use crate::file_names;
+use crate::image;
+
 
 pub fn map_directory(source_path: &Path, destination_path: &Path) {
     println!("Entered src '{:?}' and dst '{:?}'", source_path, destination_path);

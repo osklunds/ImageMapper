@@ -120,7 +120,7 @@ const SMALL_WITHOUT_EXIF_PNG_NAME: &str = "small-without-exif.png";
 const SMALL_WITHOUT_EXIF_PNG_PATH: &str = "test_resources/small-without-exif.png";
 
 #[test]
-fn test_that_map_directory_creates_the_correct_dst_structure() {
+fn test_map_directory_empty_dst() {
     let src_dir = tempfile::tempdir().unwrap();
     let src_path = &src_dir.path();
     let dst_dir = tempfile::tempdir().unwrap();
@@ -129,6 +129,10 @@ fn test_that_map_directory_creates_the_correct_dst_structure() {
 
     map_directory(src_path, dst_path);
 
+    check_that_dst_structure_is_correct(dst_path);   
+}
+
+fn check_that_dst_structure_is_correct(dst_path: &Path) {
     check_dir1(dst_path);
     check_dir2(dst_path);
     check_dir3(dst_path);
@@ -184,4 +188,34 @@ fn check_dir3(dst_path: &Path) {
     assert!(dir3_path.exists());
 
     assert_eq!(fs::read_dir(dir3_path).unwrap().count(), 0);
+}
+
+#[test]
+fn test_map_directory_removes_unwanted_src_file() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory(src_path, dst_path);
+    File::create(dst_path.join("text_file.txt")).unwrap();
+    map_directory(src_path, dst_path);
+
+    check_that_dst_structure_is_correct(dst_path);
+}
+
+#[test]
+fn test_map_directory_removes_non_existant_src_file() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory(src_path, dst_path);
+    File::create(dst_path.join("does not exist.txt")).unwrap();
+    map_directory(src_path, dst_path);
+
+    check_that_dst_structure_is_correct(dst_path);
 }

@@ -5,6 +5,8 @@ use std::fs::DirEntry;
 use std::path::Path;
 use std::io;
 
+use unwrap::unwrap;
+
 use crate::file_names;
 use crate::image;
 use crate::settings::Settings;
@@ -25,10 +27,10 @@ pub fn map_directory(source_path: &Path, destination_path: &Path, settings: &Set
 
 fn ensure_path_is_directory(destination_path: &Path) {
     if destination_path.is_file() {
-        fs::remove_file(destination_path).unwrap();
+        unwrap!(fs::remove_file(destination_path), "Could not delete the directory {:?}", destination_path);
     }
     if !destination_path.exists() {
-        fs::create_dir(destination_path).unwrap();
+        unwrap!(fs::create_dir(destination_path), "Could not create the directory {:?}", destination_path);
     }
 }
 
@@ -58,17 +60,17 @@ fn open_dir_to_iterator(path: &Path) -> Option<ReadDir> {
     match fs::read_dir(path) {
         Ok(it) => Some(it),
         Err(e) => {
-            println!("Could not open \"{}\": {}", path.canonicalize().unwrap().display(), e);
-            return None;
+            println!("Skipping {:?} because it could not be opened:\n{}", path, e);
+            None
         }
     }
 }
 
 fn open_dir_entry(dir_entry: io::Result<DirEntry>) -> Option<DirEntry> {
     match dir_entry {
-        Ok(dir_entry) => Some(dir_entry),
+        Ok(de) => Some(de),
         Err(e) => {
-            println!("Error with an entry: {}", e);
+            println!("Skipping {:?} because it could not be opened:\n{}", "", e);
             None
         }
     }

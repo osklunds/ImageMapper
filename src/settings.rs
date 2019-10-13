@@ -4,8 +4,6 @@ use std::path::PathBuf;
 use clap::{App, AppSettings, Arg, ArgMatches};
 
 pub struct Settings {
-    source_path: PathBuf,
-    destination_path: PathBuf,
     image_quality: ImageQuality,
     verbose_print: bool,
     include_videos: bool,
@@ -17,15 +15,7 @@ pub enum ImageQuality {
 }
 
 impl Settings {
-    pub fn new_from_arguments() -> Settings {
-        let matches = Self::get_matches();
-        
-        let source_path = matches.value_of("source directory").unwrap();
-        let source_path = PathBuf::from(source_path);
-
-        let destination_path = matches.value_of("destination directory").unwrap();
-        let destination_path = PathBuf::from(destination_path);
-
+    pub fn new_from_matches(matches: &ArgMatches) -> Settings {
         let image_quality = matches.value_of("image quality").unwrap();
         let image_quality = match image_quality {
             "Mobile" => ImageQuality::Mobile,
@@ -37,15 +27,14 @@ impl Settings {
         let include_videos = matches.is_present("include-videos");
 
         Settings {
-            source_path: source_path,
-            destination_path: destination_path,
             image_quality: image_quality,
             verbose_print: verbose_print,
             include_videos: include_videos
         }
     }
+}
 
-    fn get_matches<'a>() -> ArgMatches<'a> {
+pub fn get_matches<'a>() -> ArgMatches<'a> {
         App::new("ImageMapper")
         .setting(AppSettings::DisableVersion)
         .about("Maps the source directory structure to an equivalent structure in the destination directory. The differences are: 1. Images will be downscaled and compressed. 2. Images will get their exif date/time prepended to their file names. 3. Images (and optionally videos) are the only files that will be kept.")
@@ -57,7 +46,6 @@ impl Settings {
         .arg(include_videos_argument())
         .get_matches()
     }
-}
 
 fn source_path_argument<'a>() -> Arg<'a, 'a> {
     Arg::with_name("source directory")
@@ -66,11 +54,21 @@ fn source_path_argument<'a>() -> Arg<'a, 'a> {
         .help("The path to the directory that will be mapped.")
 }
 
+pub fn source_path_from_matches(matches: &ArgMatches) -> PathBuf {
+    let source_path = matches.value_of("source directory").unwrap();
+    PathBuf::from(source_path)
+}
+
 fn destination_path_argument<'a>() -> Arg<'a, 'a> {
     Arg::with_name("destination directory")
         .required(true)
         .takes_value(true)
         .help("The path to the directory where the result of the mapping will be placed.")
+}
+
+pub fn destination_path_from_matches(matches: &ArgMatches) -> PathBuf {
+    let destination_path = matches.value_of("destination directory").unwrap();
+    PathBuf::from(destination_path)
 }
 
 fn image_quality_argument<'a>() -> Arg<'a, 'a> {

@@ -126,8 +126,14 @@ const SMALL_WITHOUT_EXIF_PNG_PATH: &str = "test_resources/small-without-exif.png
 
 const SETTINGS: Settings = Settings {
     image_quality: ImageQuality::Mobile,
-    verbose_print: true,
+    verbose_print: false,
     include_videos: true,
+};
+
+const SETTINGS_NO_VIDEO: Settings = Settings {
+    image_quality: ImageQuality::Mobile,
+    verbose_print: false,
+    include_videos: false,
 };
 
 #[test]
@@ -218,10 +224,7 @@ fn test_map_directory_correctly_fills_empty_dst_without_videos() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    let mut settings = SETTINGS;
-    settings.include_videos = false;
-
-    map_directory(src_path, dst_path, &settings);
+    map_directory(src_path, dst_path, &SETTINGS_NO_VIDEO);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, false);   
 }
@@ -314,6 +317,20 @@ fn test_map_directory_removes_non_existant_src_video() {
     map_directory(src_path, dst_path, &SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
+}
+
+#[test]
+fn test_map_directory_removes_existant_src_video_if_no_videos_desired() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, &SETTINGS_NO_VIDEO);
+
+    check_that_dst_structure_is_correct_if_videos(dst_path, false);
 }
 
 #[test]

@@ -131,7 +131,7 @@ const SETTINGS: Settings = Settings {
 };
 
 #[test]
-fn test_map_directory_correctly_fills_empty_dst() {
+fn test_map_directory_correctly_fills_empty_dst_with_videos() {
     let src_dir = tempfile::tempdir().unwrap();
     let src_path = &src_dir.path();
     let dst_dir = tempfile::tempdir().unwrap();
@@ -140,10 +140,10 @@ fn test_map_directory_correctly_fills_empty_dst() {
 
     map_directory(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct(dst_path);   
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);   
 }
 
-fn check_that_dst_structure_is_correct(dst_path: &Path) {
+fn check_that_dst_structure_is_correct_if_videos(dst_path: &Path, videos: bool) {
     check_dir1(dst_path);
     check_dir2(dst_path);
     check_dir3(dst_path);
@@ -152,9 +152,17 @@ fn check_that_dst_structure_is_correct(dst_path: &Path) {
     assert!(dst_path.join(SMALL_WITH_EXIF_DST_NAME).exists());
     assert!(dst_path.join("small-without-exif.jpg.jpg").exists());
     assert!(dst_path.join("small-without-exif.png.jpg").exists());
-    assert!(dst_path.join("video.m4v").exists());
 
-    assert_eq!(fs::read_dir(dst_path).unwrap().count(), 7);
+    if videos {
+        assert!(dst_path.join("video.m4v").exists());
+    }
+
+    let entry_count = match videos {
+        true  => 7,
+        false => 6,
+    };
+
+    assert_eq!(fs::read_dir(dst_path).unwrap().count(), entry_count);
 }
 
 fn check_dir1(dst_path: &Path) {
@@ -203,6 +211,22 @@ fn check_dir3(dst_path: &Path) {
 }
 
 #[test]
+fn test_map_directory_correctly_fills_empty_dst_without_videos() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    let mut settings = SETTINGS;
+    settings.include_videos = false;
+
+    map_directory(src_path, dst_path, &settings);
+
+    check_that_dst_structure_is_correct_if_videos(dst_path, false);   
+}
+
+#[test]
 fn test_map_directory_removes_unwanted_src_file() {
     let src_dir = tempfile::tempdir().unwrap();
     let src_path = &src_dir.path();
@@ -214,7 +238,7 @@ fn test_map_directory_removes_unwanted_src_file() {
     File::create(dst_path.join("text_file.txt")).unwrap();
     map_directory(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct(dst_path);
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
 
 #[test]
@@ -229,7 +253,7 @@ fn test_map_directory_removes_non_existant_src_file() {
     File::create(dst_path.join("does not exist.txt")).unwrap();
     map_directory(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct(dst_path);
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
 
 #[test]
@@ -244,7 +268,7 @@ fn test_map_directory_removes_non_existant_src_dir() {
     fs::create_dir(dst_path.join("dir4")).unwrap();
     map_directory(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct(dst_path);
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
 
 #[test]
@@ -259,7 +283,7 @@ fn test_map_directory_removes_non_existant_src_image_double_extension() {
     File::create(dst_path.join("does not exist.jpg.jpg")).unwrap();
     map_directory(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct(dst_path);
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
 
 #[test]
@@ -274,7 +298,7 @@ fn test_map_directory_removes_non_existant_src_image_single_extension() {
     File::create(dst_path.join("does not exist.jpg")).unwrap();
     map_directory(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct(dst_path);
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
 
 #[test]
@@ -289,7 +313,7 @@ fn test_map_directory_removes_non_existant_src_video() {
     File::create(dst_path.join("does not exist.m4v")).unwrap();
     map_directory(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct(dst_path);
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
 
 #[test]
@@ -304,7 +328,7 @@ fn test_map_directory_removes_non_existant_src_image_exif() {
     File::create(dst_path.join("   2001-01-01 11;22;33 does not exist.jpg.jpg")).unwrap();
     map_directory(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct(dst_path);
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
 
 #[test]
@@ -382,7 +406,7 @@ fn test_map_directory_adds_missing_image_exif() {
 
     map_directory(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct(dst_path);
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
 
 #[test]
@@ -400,7 +424,7 @@ fn test_map_directory_adds_missing_image() {
 
     map_directory(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct(dst_path);
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
 
 #[test]
@@ -418,5 +442,5 @@ fn test_map_directory_adds_missing_video() {
 
     map_directory(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct(dst_path);
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }

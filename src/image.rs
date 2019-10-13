@@ -7,8 +7,10 @@ use image::FilterType::Gaussian;
 use image::jpeg::JPEGEncoder;
 use image::ColorType;
 
+use crate::settings::{Settings, ImageQuality};
+
 #[cfg(not(test))]
-pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path) {
+pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, settings: &Settings) {
     let original = image::open(source_path).unwrap();
     let resized = original.resize(1024, 1024, Gaussian);
     let width = resized.width();
@@ -21,7 +23,7 @@ pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path)
 }
 
 #[cfg(test)]
-pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path) {
+pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, settings: &Settings) {
     use std::fs;
     fs::copy(source_path, destination_path).unwrap();
 }

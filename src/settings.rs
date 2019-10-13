@@ -4,9 +4,9 @@ use std::path::PathBuf;
 use clap::{App, AppSettings, Arg, ArgMatches};
 
 pub struct Settings {
-    image_quality: ImageQuality,
-    verbose_print: bool,
-    include_videos: bool,
+    pub image_quality: ImageQuality,
+    pub verbose_print: bool,
+    pub include_videos: bool,
 }
 
 pub enum ImageQuality {

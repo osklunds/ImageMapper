@@ -3,6 +3,7 @@ use std::ffi::OsStr;
 use std::path::Path;
 
 use exif::Tag;
+use unwrap::unwrap;
 
 pub fn extension_is_image_extension(extension: &OsStr) -> bool {
     if let Some(extension) = extension.to_str() {
@@ -49,7 +50,9 @@ pub fn extension_is_destination_image_extension(extension: &OsStr) -> bool {
 }
 
 pub fn destination_image_name_from_image_path(image_path: &Path) -> String {
-    let file_name = image_path.file_name().expect("Could not get the file_name.").to_str().expect("Could not convert file_name to str.");
+    let file_name = unwrap!(image_path.file_name(), "Could not get the file name of {:?}", image_path);
+    let file_name = unwrap!(file_name.to_str(), "Could not convert the file name {:?} to str", file_name);
+
     let date_time_string = date_time_string_from_image_path(image_path);
 
     if date_time_string.is_empty() {
@@ -61,7 +64,7 @@ pub fn destination_image_name_from_image_path(image_path: &Path) -> String {
 
 // Returns a string of the format "yyyy-mm-dd hh;mm;ss" if the image has an exif date, or "" if it doesn't.
 fn date_time_string_from_image_path(image_path: &Path) -> String {
-    let file = std::fs::File::open(image_path).unwrap();
+    let file = unwrap!(std::fs::File::open(image_path), "Could not open the image {:?}", image_path);
     let reader = exif::Reader::new(&mut std::io::BufReader::new(&file));
 
     if let Ok(r) = reader {
@@ -75,10 +78,11 @@ fn date_time_string_from_image_path(image_path: &Path) -> String {
 pub fn destination_image_name_to_source_image_name(file_name: &str) -> Option<String> {
     let length = file_name.len();
     if length >= 24 && file_name.get(0..3) == Some("   ") {
-        let trimmed = file_name.get(23..(length-4)).expect("Could not trim a file name.");
+        let trimmed = unwrap!(file_name.get(23..(length-4)), "Could not trim the str: {:?}", file_name);
         return Some(trimmed.to_string());
     } else if length >= 4 {
-        return Some(file_name.get(0..length-4).expect("Could not trim a file name.").to_string());
+        let trimmed = unwrap!(file_name.get(0..length-4), "Could not trim the str: {:?}", file_name);
+        return Some(trimmed.to_string());
     } else {
         return None;
     }

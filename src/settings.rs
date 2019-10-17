@@ -72,7 +72,7 @@ pub fn destination_path_from_matches(matches: &ArgMatches) -> PathBuf {
 }
 
 fn image_quality_argument<'a>() -> Arg<'a, 'a> {
-    Arg::with_name("image_quality")
+    Arg::with_name("image quality")
         .required(true)
         .takes_value(true)
         .possible_values(&["Mobile", "TV"])

@@ -16,6 +16,6 @@ fn main() {
     let settings = Settings::new_from_matches(&matches);
     let source_path = settings::source_path_from_matches(&matches);
     let destination_path = settings::destination_path_from_matches(&matches);
-
+    
     mapper::map_directory(&source_path, &destination_path, &settings);
 }

@@ -16,7 +16,7 @@ mod tests;
 
 pub fn map_directory(source_path: &Path, destination_path: &Path, settings: &Settings) {
     if settings.verbose_print {
-        println!("Entered source: '{:?}' and destination: '{:?}'", source_path, destination_path);
+        println!("Entered source: {:?} and destination: {:?}", source_path, destination_path);
     }
 
     ensure_path_is_directory(destination_path);
@@ -92,7 +92,7 @@ fn handle_source_file(source_file_path: &Path, destination_path: &Path, settings
             handle_source_video(source_file_path, destination_path, settings);
         }
     }
-    // Some files don't have extensions, so if one is missing, it's
+    // Some files dont have extensions, so if one is missing, its
     // not an image or a video, so ignore it.
 }
 
@@ -104,11 +104,11 @@ fn handle_source_image(source_image_path: &Path, destination_path: &Path, settin
         image::open_compress_and_save_image(source_image_path, destination_image_path, settings);
 
         if settings.verbose_print {
-            println!("Created image '{:?}'", destination_image_path);
+            println!("Created image {:?}", destination_image_path);
         }
     }
     else if settings.verbose_print {
-        println!("Image '{:?}' aleady exists", destination_image_path);
+        println!("Image {:?} aleady exists", destination_image_path);
     }
 }
 
@@ -120,11 +120,11 @@ fn handle_source_video(source_video_path: &Path, destination_path: &Path, settin
         unwrap!(fs::copy(source_video_path, destination_video_path), "Could not copy a video {:?} to {:?}", source_video_path, destination_video_path);
         
         if settings.verbose_print {
-            println!("Created video '{:?}'", destination_video_path);
+            println!("Created video {:?}", destination_video_path);
         }
     }
     else if settings.verbose_print {
-        println!("Video '{:?}' aleady exists", destination_video_path);
+        println!("Video {:?} aleady exists", destination_video_path);
     }
 }
 
@@ -158,7 +158,7 @@ fn handle_destination_dir(destination_dir_path: &Path, source_path: &Path, setti
         unwrap!(fs::remove_dir_all(destination_dir_path), "Could not remove a destination directory {:?}", destination_dir_path);
 
         if settings.verbose_print {
-            println!("Deleted '{:?}'", destination_dir_path);
+            println!("Deleted {:?}", destination_dir_path);
         }
     }
     // No need to recursively call map_directory. If a destination dir
@@ -188,7 +188,7 @@ fn handle_destination_image(destination_image_path: &Path, source_path: &Path, s
         let corresponding_source_entry_path = source_path.join(corresponding_source_entry_name);
 
         // The corresponding source entry must be a file, otherwise
-        // it doesn't exist or is a dir.
+        // it doesnt exist or is a dir.
         if !corresponding_source_entry_path.is_file() {
             fs::remove_file(destination_image_path).unwrap();
             deleted = true;
@@ -200,7 +200,7 @@ fn handle_destination_image(destination_image_path: &Path, source_path: &Path, s
     }
 
     if settings.verbose_print && deleted {
-        println!("Deleted '{:?}'", destination_image_path);
+        println!("Deleted {:?}", destination_image_path);
     }
 }
 
@@ -209,13 +209,13 @@ fn handle_destination_video(destination_video_path: &Path, source_path: &Path, s
     let corresponding_source_entry_path = source_path.join(destination_video_name);
 
     // The corresponding source entry must be a file, otherwise
-    // it doesn't exist or is a dir.
+    // it doesnt exist or is a dir.
     // We must also want to have videos in the destination.
     if !(corresponding_source_entry_path.is_file() && settings.include_videos) {
            unwrap!(fs::remove_file(destination_video_path), "Could not delete {:?}", destination_video_path);
 
         if settings.verbose_print {
-            println!("Deleted '{:?}'", destination_video_path);
+            println!("Deleted {:?}", destination_video_path);
         }
     }
 }
@@ -223,13 +223,13 @@ fn handle_destination_video(destination_video_path: &Path, source_path: &Path, s
 fn handle_destination_other_file(destination_file_path: &Path, settings: &Settings) {
     unwrap!(fs::remove_file(destination_file_path), "Could not delete {:?}", destination_file_path);
     if settings.verbose_print {
-        println!("Deleted '{:?}'", destination_file_path);
+        println!("Deleted {:?}", destination_file_path);
     }
 }
 
 fn handle_destination_extensionless_file(destination_file_path: &Path, settings: &Settings) {
     unwrap!(fs::remove_file(destination_file_path), "Could not delete {:?}", destination_file_path);
     if settings.verbose_print {
-        println!("Deleted '{:?}'", destination_file_path);
+        println!("Deleted {:?}", destination_file_path);
     }
 }

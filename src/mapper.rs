@@ -210,7 +210,8 @@ fn handle_destination_video(destination_video_path: &Path, source_path: &Path, s
 
     // The corresponding source entry must be a file, otherwise
     // it doesn't exist or is a dir.
-    if !corresponding_source_entry_path.is_file() {
+    // We must also want to have videos in the destination.
+    if !(corresponding_source_entry_path.is_file() && settings.include_videos) {
            unwrap!(fs::remove_file(destination_video_path), "Could not delete {:?}", destination_video_path);
 
         if settings.verbose_print {

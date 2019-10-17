@@ -77,7 +77,7 @@ fn open_dir_entry(dir_entry: io::Result<DirEntry>) -> Option<DirEntry> {
 }
 
 fn handle_source_dir(source_dir_path: &Path, destination_path: &Path, settings: &Settings) {
-    let source_dir_name = source_dir_path.file_name().expect("Could not get the file name.");
+    let source_dir_name = unwrap!(source_dir_path.file_name(), "Could not get the file name of a directory {:?}", source_dir_path);
     let destination_dir_path = &destination_path.join(source_dir_name);
 
     map_directory(source_dir_path, destination_dir_path, settings);
@@ -113,11 +113,11 @@ fn handle_source_image(source_image_path: &Path, destination_path: &Path, settin
 }
 
 fn handle_source_video(source_video_path: &Path, destination_path: &Path, settings: &Settings) {
-    let destination_video_name = source_video_path.file_name().expect("Could not get file name for a video.");
+    let destination_video_name = unwrap!(source_video_path.file_name(), "Could not get the file name of a video {:?}", source_video_path);
     let destination_video_path = &destination_path.join(destination_video_name);
 
     if !destination_video_path.exists() {
-        fs::copy(source_video_path, destination_video_path).expect("Could not copy a video.");
+        unwrap!(fs::copy(source_video_path, destination_video_path), "Could not copy a video {:?} to {:?}", source_video_path, destination_video_path);
         
         if settings.verbose_print {
             println!("Created video '{:?}'", destination_video_path);
@@ -151,11 +151,11 @@ fn iterate_destination_entries(source_path: &Path, destination_path: &Path, sett
 }
 
 fn handle_destination_dir(destination_dir_path: &Path, source_path: &Path, settings: &Settings) {
-    let destination_dir_name = destination_dir_path.file_name().expect("Could not get a file_name.");
+    let destination_dir_name = unwrap!(destination_dir_path.file_name(), "Could not get the name of a directory {:?}", destination_dir_path);
     let corresponding_source_entry_path = source_path.join(destination_dir_name);
 
     if !corresponding_source_entry_path.is_dir() {
-        fs::remove_dir_all(destination_dir_path).unwrap();
+        unwrap!(fs::remove_dir_all(destination_dir_path), "Could not remove a destination directory {:?}", destination_dir_path);
 
         if settings.verbose_print {
             println!("Deleted '{:?}'", destination_dir_path);
@@ -205,13 +205,13 @@ fn handle_destination_image(destination_image_path: &Path, source_path: &Path, s
 }
 
 fn handle_destination_video(destination_video_path: &Path, source_path: &Path, settings: &Settings) {
-    let destination_video_name = destination_video_path.file_name().expect("Could not get a file name.").to_str().expect("Could not convert to str.");
+    let destination_video_name = unwrap!(destination_video_path.file_name(), "Could not get the file name from {:?}", destination_video_path);
     let corresponding_source_entry_path = source_path.join(destination_video_name);
 
     // The corresponding source entry must be a file, otherwise
     // it doesn't exist or is a dir.
     if !corresponding_source_entry_path.is_file() {
-           fs::remove_file(destination_video_path).unwrap();
+           unwrap!(fs::remove_file(destination_video_path), "Could not delete {:?}", destination_video_path);
 
         if settings.verbose_print {
             println!("Deleted '{:?}'", destination_video_path);
@@ -220,14 +220,14 @@ fn handle_destination_video(destination_video_path: &Path, source_path: &Path, s
 }
 
 fn handle_destination_other_file(destination_file_path: &Path, settings: &Settings) {
-    fs::remove_file(destination_file_path).expect("Could not remove a file.");
+    unwrap!(fs::remove_file(destination_file_path), "Could not delete {:?}", destination_file_path);
     if settings.verbose_print {
         println!("Deleted '{:?}'", destination_file_path);
     }
 }
 
 fn handle_destination_extensionless_file(destination_file_path: &Path, settings: &Settings) {
-    fs::remove_file(destination_file_path).expect("Could not remove a file.");
+    unwrap!(fs::remove_file(destination_file_path), "Could not delete {:?}", destination_file_path);
     if settings.verbose_print {
         println!("Deleted '{:?}'", destination_file_path);
     }

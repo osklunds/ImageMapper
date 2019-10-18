@@ -35,16 +35,10 @@ fn ensure_path_is_directory(destination_path: &Path) {
 }
 
 fn iterate_source_entries(source_path: &Path, destination_path: &Path, settings: &Settings) {
-    let source_entries = match open_dir_to_iterator(source_path) {
-        Some(it) => it,
-        None => return ()
-    };
+    let source_entries = open_dir_to_iterator(source_path);
 
     for source_entry in source_entries {
-        let source_entry = match open_dir_entry(source_entry) {
-            Some(se) => se,
-            None => continue
-        };
+        let source_entry = unwrap!(source_entry, "Could not open a source entry");
 
         let source_entry_path = &source_entry.path();
 
@@ -56,24 +50,8 @@ fn iterate_source_entries(source_path: &Path, destination_path: &Path, settings:
     }
 }
 
-fn open_dir_to_iterator(path: &Path) -> Option<ReadDir> {
-    match fs::read_dir(path) {
-        Ok(it) => Some(it),
-        Err(e) => {
-            println!("Skipping {:?} because it could not be opened:\n{}", path, e);
-            None
-        }
-    }
-}
-
-fn open_dir_entry(dir_entry: io::Result<DirEntry>) -> Option<DirEntry> {
-    match dir_entry {
-        Ok(de) => Some(de),
-        Err(e) => {
-            println!("Skipping {:?} because it could not be opened:\n{}", "", e);
-            None
-        }
-    }
+fn open_dir_to_iterator(path: &Path) -> ReadDir {
+    unwrap!(fs::read_dir(path), "Could not open the directory {:?}", path)
 }
 
 fn handle_source_dir(source_dir_path: &Path, destination_path: &Path, settings: &Settings) {
@@ -129,16 +107,10 @@ fn handle_source_video(source_video_path: &Path, destination_path: &Path, settin
 }
 
 fn iterate_destination_entries(source_path: &Path, destination_path: &Path, settings: &Settings) {
-    let destination_entries = match open_dir_to_iterator(destination_path) {
-        Some(iterator) => iterator,
-        None           => return ()
-    };
+    let destination_entries = open_dir_to_iterator(destination_path);
 
     for destination_entry in destination_entries {
-        let destination_entry = match open_dir_entry(destination_entry) {
-            Some(de) => de,
-            None     => return ()
-        };
+        let destination_entry = unwrap!(destination_entry, "Could not open a destination entry");
 
         let destination_entry_path = &destination_entry.path();
 

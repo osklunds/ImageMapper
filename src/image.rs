@@ -24,8 +24,8 @@ pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path,
 
     let mut file = unwrap!(File::create(destination_path), "Could not create the image {:?}", destination_path);
     let factor = match settings.image_quality {
-        ImageQuality::Mobile     => 60, // TODO: tune these constants
-        ImageQuality::Television => 60,
+        ImageQuality::Mobile     => 30,
+        ImageQuality::Television => 70,
     };
     let mut encoder = JPEGEncoder::new_with_quality(&mut file, factor);
     unwrap!(encoder.encode(&pixels, width, height, ColorType::RGB(8)), "Could not encode the image {:?}", destination_path);

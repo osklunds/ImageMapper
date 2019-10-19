@@ -88,7 +88,7 @@ fn verbose_print_argument<'a>() -> Arg<'a, 'a> {
 }
 
 fn include_videos_argument<'a>() -> Arg<'a, 'a> {
-    Arg::with_name("video")
+    Arg::with_name("include-videos")
         .short("i")
         .long("include-videos")
         .takes_value(false)

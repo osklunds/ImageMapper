@@ -1,7 +1,7 @@
 
 # ImageMapper
 
-`ImageMapper` is a Rust command line tool for mapping/synchronizing a directory structure into a new structure hierarchy with the following properties:
+`ImageMapper` is a Rust command line tool for mapping/synchronizing a directory structure into a new structure with the following properties:
 
 - Only images and videos are kept
 - The exif date/time of images are prepended to their file name
@@ -55,7 +55,7 @@ In a nutshell: supply the paths of the source and destination directories and th
 
 ## Building, running, testing
 
-Use `cargo build`, `cargo run` and `cargo test` as usual. When building the program for real-use, include the `--release` flag. Then image conversions become significantly faster.
+Use `cargo build`, `cargo run` and `cargo test` as usual. When building the program for real use, include the `--release` flag. Then image conversions become significantly faster.
 
 ## Compatibility
 

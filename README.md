@@ -57,9 +57,24 @@ In a nutshell: supply the paths of the source and destination directories and th
 
 Use `cargo build`, `cargo run` and `cargo test` as usual. When building the program for real use, include the `--release` flag. Then image conversions become significantly faster.
 
+## Error handling
+
+Currently when something goes wrong, `ImageMapper` will exit and print what happened. As I continue to use `ImageMapper` I plan to update the error handling to something appropriate.
+
 ## Compatibility
 
-TODO
+Supported images:
+
+- `jpg`
+- `png`
+
+Supported videos:
+
+- `mov`
+- `avi`
+- `mp4`
+- `m4v`
+- `mpg`
 
 ## Credits
 

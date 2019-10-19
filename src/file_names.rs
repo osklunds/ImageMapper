@@ -106,7 +106,7 @@ mod tests {
     
     #[test]
     fn extension_is_image_extension_is_false_for_non_image_extensions() {
-        let extensions = vec!["gif", "m4v", "mp4", "mov", "pdf", "doc"];
+        let extensions = vec!["gif", "m4v", "mp4", "mov", "pdf", "doc", "txt"];
 
         for extension in extensions.iter() {
             assert!(!extension_is_image_extension(OsStr::new(extension)));

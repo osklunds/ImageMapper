@@ -13,10 +13,6 @@ pub fn extension_is_image_extension(extension: &OsStr) -> bool {
             "jpg" => true,
             "jpeg" => true,
             "png" => true,
-            "gif" => true,
-            "nef" => true,
-            "tif" => true,
-            "tiff" => true,
             _ => false
         }
     } else {
@@ -101,7 +97,7 @@ mod tests {
 
     #[test]
     fn extension_is_image_extension_is_true_for_image_extensions() {
-        let extensions = vec!["jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF", "nef", "NEF", "tif", "TIF", "tiff", "TIFF"];
+        let extensions = vec!["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"];
 
         for extension in extensions.iter() {
             assert!(extension_is_image_extension(OsStr::new(extension)));
@@ -110,7 +106,7 @@ mod tests {
     
     #[test]
     fn extension_is_image_extension_is_false_for_non_image_extensions() {
-        let extensions = vec!["m4v", "mp4", "mov", "pdf", "doc"];
+        let extensions = vec!["gif", "m4v", "mp4", "mov", "pdf", "doc"];
 
         for extension in extensions.iter() {
             assert!(!extension_is_image_extension(OsStr::new(extension)));

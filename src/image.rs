@@ -18,6 +18,7 @@ pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path,
         ImageQuality::Television => original.resize(1920, 1080, Gaussian),
     };
     
+    let color = resized.color();
     let width = resized.width();
     let height = resized.height();
     let pixels = resized.raw_pixels();
@@ -28,7 +29,7 @@ pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path,
         ImageQuality::Television => 70,
     };
     let mut encoder = JPEGEncoder::new_with_quality(&mut file, factor);
-    unwrap!(encoder.encode(&pixels, width, height, ColorType::RGB(8)), "Could not encode the image {:?}", destination_path);
+    unwrap!(encoder.encode(&pixels, width, height, color), "Could not encode the image {:?}", destination_path);
 }
 
 #[cfg(test)]

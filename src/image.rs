@@ -1,4 +1,6 @@
 
+#![allow(dead_code)]
+
 use std::fs::File;
 use std::path::Path;
 use std::io::BufReader;
@@ -6,7 +8,6 @@ use std::io::BufReader;
 use image::GenericImageView;
 use image::FilterType::Gaussian;
 use image::jpeg::JPEGEncoder;
-use image::ColorType;
 use image::DynamicImage;
 use unwrap::unwrap;
 use exif::{Reader, Tag, Value};
@@ -84,7 +85,7 @@ fn encode_and_save_image(image: DynamicImage, destination_path: &Path, settings:
 }
 
 #[cfg(test)]
-pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, settings: &Settings) {
+pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, _settings: &Settings) {
     use std::fs;
     unwrap!(fs::copy(source_path, destination_path), "Could not copy from {:?} to {:?}", source_path, destination_path);
 }

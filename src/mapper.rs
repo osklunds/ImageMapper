@@ -1,9 +1,7 @@
 
 use std::fs;
 use std::fs::ReadDir;
-use std::fs::DirEntry;
 use std::path::Path;
-use std::io;
 
 use unwrap::unwrap;
 

@@ -1,6 +1,8 @@
 
 use std::ffi::OsStr;
 use std::path::Path;
+use std::fs::File;
+use std::io::BufReader;
 
 use exif::Tag;
 use unwrap::unwrap;
@@ -64,8 +66,8 @@ pub fn destination_image_name_from_image_path(image_path: &Path) -> String {
 
 // Returns a string of the format "yyyy-mm-dd hh;mm;ss" if the image has an exif date, or "" if it doesn't.
 fn date_time_string_from_image_path(image_path: &Path) -> String {
-    let file = unwrap!(std::fs::File::open(image_path), "Could not open the image {:?}", image_path);
-    let reader = exif::Reader::new(&mut std::io::BufReader::new(&file));
+    let file = unwrap!(File::open(image_path), "Could not open the image {:?}", image_path);
+    let reader = exif::Reader::new(&mut BufReader::new(&file));
 
     if let Ok(r) = reader {
         if let Some(date_time) = r.get_field(Tag::DateTimeOriginal, false) {

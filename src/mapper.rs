@@ -14,7 +14,7 @@ mod tests;
 
 pub fn map_directory(source_path: &Path, destination_path: &Path, settings: &Settings) {
     if settings.verbose_print {
-        println!("Entered source: {:?} and destination: {:?}", source_path, destination_path);
+        println!("Entered source: \"{}\" and destination: \"{}\"", source_path.display(), destination_path.display());
     }
 
     ensure_path_is_directory(destination_path);
@@ -25,10 +25,10 @@ pub fn map_directory(source_path: &Path, destination_path: &Path, settings: &Set
 
 fn ensure_path_is_directory(destination_path: &Path) {
     if destination_path.is_file() {
-        unwrap!(fs::remove_file(destination_path), "Could not delete the directory {:?}", destination_path);
+        unwrap!(fs::remove_file(destination_path), "Could not delete the directory \"{}\"", destination_path.display());
     }
     if !destination_path.exists() {
-        unwrap!(fs::create_dir(destination_path), "Could not create the directory {:?}", destination_path);
+        unwrap!(fs::create_dir(destination_path), "Could not create the directory \"{}\"", destination_path.display());
     }
 }
 
@@ -49,11 +49,11 @@ fn iterate_source_entries(source_path: &Path, destination_path: &Path, settings:
 }
 
 fn open_dir_to_iterator(path: &Path) -> ReadDir {
-    unwrap!(fs::read_dir(path), "Could not open the directory {:?}", path)
+    unwrap!(fs::read_dir(path), "Could not open the directory \"{}\"", path.display())
 }
 
 fn handle_source_dir(source_dir_path: &Path, destination_path: &Path, settings: &Settings) {
-    let source_dir_name = unwrap!(source_dir_path.file_name(), "Could not get the file name of a directory {:?}", source_dir_path);
+    let source_dir_name = unwrap!(source_dir_path.file_name(), "Could not get the file name of a directory \"{}\"", source_dir_path.display());
     let destination_dir_path = &destination_path.join(source_dir_name);
 
     map_directory(source_dir_path, destination_dir_path, settings);
@@ -80,27 +80,27 @@ fn handle_source_image(source_image_path: &Path, destination_path: &Path, settin
         image::open_compress_and_save_image(source_image_path, destination_image_path, settings);
 
         if settings.verbose_print {
-            println!("Created image {:?}", destination_image_path);
+            println!("Created image \"{}\"", destination_image_path.display());
         }
     }
     else if settings.verbose_print {
-        println!("Image {:?} aleady exists", destination_image_path);
+        println!("Image \"{}\" aleady exists", destination_image_path.display());
     }
 }
 
 fn handle_source_video(source_video_path: &Path, destination_path: &Path, settings: &Settings) {
-    let destination_video_name = unwrap!(source_video_path.file_name(), "Could not get the file name of a video {:?}", source_video_path);
+    let destination_video_name = unwrap!(source_video_path.file_name(), "Could not get the file name of a video \"{}\"", source_video_path.display());
     let destination_video_path = &destination_path.join(destination_video_name);
 
     if !destination_video_path.exists() {
-        unwrap!(fs::copy(source_video_path, destination_video_path), "Could not copy a video {:?} to {:?}", source_video_path, destination_video_path);
+        unwrap!(fs::copy(source_video_path, destination_video_path), "Could not copy a video \"{}\" to \"{}\"", source_video_path.display(), destination_video_path.display());
         
         if settings.verbose_print {
-            println!("Created video {:?}", destination_video_path);
+            println!("Created video \"{}\"", destination_video_path.display());
         }
     }
     else if settings.verbose_print {
-        println!("Video {:?} aleady exists", destination_video_path);
+        println!("Video \"{}\" aleady exists", destination_video_path.display());
     }
 }
 
@@ -121,14 +121,14 @@ fn iterate_destination_entries(source_path: &Path, destination_path: &Path, sett
 }
 
 fn handle_destination_dir(destination_dir_path: &Path, source_path: &Path, settings: &Settings) {
-    let destination_dir_name = unwrap!(destination_dir_path.file_name(), "Could not get the name of a directory {:?}", destination_dir_path);
+    let destination_dir_name = unwrap!(destination_dir_path.file_name(), "Could not get the name of a directory \"{}\"", destination_dir_path.display());
     let corresponding_source_entry_path = source_path.join(destination_dir_name);
 
     if !corresponding_source_entry_path.is_dir() {
-        unwrap!(fs::remove_dir_all(destination_dir_path), "Could not remove a destination directory {:?}", destination_dir_path);
+        unwrap!(fs::remove_dir_all(destination_dir_path), "Could not remove a destination directory \"{}\"", destination_dir_path.display());
 
         if settings.verbose_print {
-            println!("Deleted {:?}", destination_dir_path);
+            println!("Deleted \"{}\"", destination_dir_path.display());
         }
     }
     // No need to recursively call map_directory. If a destination dir
@@ -170,36 +170,36 @@ fn handle_destination_image(destination_image_path: &Path, source_path: &Path, s
     }
 
     if settings.verbose_print && deleted {
-        println!("Deleted {:?}", destination_image_path);
+        println!("Deleted {}", destination_image_path.display());
     }
 }
 
 fn handle_destination_video(destination_video_path: &Path, source_path: &Path, settings: &Settings) {
-    let destination_video_name = unwrap!(destination_video_path.file_name(), "Could not get the file name from {:?}", destination_video_path);
+    let destination_video_name = unwrap!(destination_video_path.file_name(), "Could not get the file name from \"{}\"", destination_video_path.display());
     let corresponding_source_entry_path = source_path.join(destination_video_name);
 
     // The corresponding source entry must be a file, otherwise
     // it doesnt exist or is a dir.
     // We must also want to have videos in the destination.
     if !(corresponding_source_entry_path.is_file() && settings.include_videos) {
-           unwrap!(fs::remove_file(destination_video_path), "Could not delete {:?}", destination_video_path);
+           unwrap!(fs::remove_file(destination_video_path), "Could not delete \"{}\"", destination_video_path.display());
 
         if settings.verbose_print {
-            println!("Deleted {:?}", destination_video_path);
+            println!("Deleted \"{}\"", destination_video_path.display());
         }
     }
 }
 
 fn handle_destination_other_file(destination_file_path: &Path, settings: &Settings) {
-    unwrap!(fs::remove_file(destination_file_path), "Could not delete {:?}", destination_file_path);
+    unwrap!(fs::remove_file(destination_file_path), "Could not delete \"{}\"", destination_file_path.display());
     if settings.verbose_print {
-        println!("Deleted {:?}", destination_file_path);
+        println!("Deleted \"{}\"", destination_file_path.display());
     }
 }
 
 fn handle_destination_extensionless_file(destination_file_path: &Path, settings: &Settings) {
-    unwrap!(fs::remove_file(destination_file_path), "Could not delete {:?}", destination_file_path);
+    unwrap!(fs::remove_file(destination_file_path), "Could not delete \"{}\"", destination_file_path.display());
     if settings.verbose_print {
-        println!("Deleted {:?}", destination_file_path);
+        println!("Deleted \"{}\"", destination_file_path.display());
     }
 }

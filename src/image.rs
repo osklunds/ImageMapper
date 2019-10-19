@@ -25,11 +25,11 @@ pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path,
 }
 
 fn read_original_image(image_path: &Path) -> DynamicImage {
-    unwrap!(image::open(image_path), "Could not open the image {:?}", image_path)
+    unwrap!(image::open(image_path), "Could not open the image \"{}\"", image_path.display())
 }
 
 fn orientation_from_path(image_path: &Path) -> u16 {
-    let file = unwrap!(File::open(image_path), "Could not open the image for exif {:?}", image_path);
+    let file = unwrap!(File::open(image_path), "Could not open the image for exif \"{}\"", image_path.display());
     let mut buf_reader = BufReader::new(&file);
     let exif_reader = Reader::new(&mut buf_reader);
 
@@ -74,18 +74,18 @@ fn encode_and_save_image(image: DynamicImage, destination_path: &Path, settings:
     let height = image.height();
     let pixels = image.raw_pixels();
 
-    let mut file = unwrap!(File::create(destination_path), "Could not create the image {:?}", destination_path);
+    let mut file = unwrap!(File::create(destination_path), "Could not create the image \"{}\"", destination_path.display());
     let factor = match settings.image_quality {
         ImageQuality::Mobile     => 30,
         ImageQuality::Television => 70,
     };
 
     let mut encoder = JPEGEncoder::new_with_quality(&mut file, factor);
-    unwrap!(encoder.encode(&pixels, width, height, color), "Could not encode the image {:?}", destination_path);
+    unwrap!(encoder.encode(&pixels, width, height, color), "Could not encode the image \"{}\"", destination_path.display());
 }
 
 #[cfg(test)]
 pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, _settings: &Settings) {
     use std::fs;
-    unwrap!(fs::copy(source_path, destination_path), "Could not copy from {:?} to {:?}", source_path, destination_path);
+    unwrap!(fs::copy(source_path, destination_path), "Could not copy from \"{}\" to \"{}\"", source_path.display(), destination_path.display());
 }

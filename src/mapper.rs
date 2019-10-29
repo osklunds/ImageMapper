@@ -77,9 +77,9 @@ fn handle_source_image(source_image_path: &Path, destination_path: &Path, settin
     let destination_image_path = &destination_path.join(destination_image_name);
 
     if !destination_image_path.exists() {
-        image::open_compress_and_save_image(source_image_path, destination_image_path, settings);
+        let successful = image::open_compress_and_save_image(source_image_path, destination_image_path, settings);
 
-        if settings.verbose_print {
+        if settings.verbose_print && successful {
             println!("Created image \"{}\"", destination_image_path.display());
         }
     }

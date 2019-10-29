@@ -15,17 +15,28 @@ use exif::{Reader, Tag, Value};
 use crate::settings::{Settings, ImageQuality};
 
 #[cfg(not(test))]
-pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, settings: &Settings) {
-    let original = read_original_image(source_path);
-    let orientation = orientation_from_path(source_path);
-    let rotated = rotate_image(original, orientation);
-    let dimensions = dimensions_from_settings(settings);
-    let resized = resize_image(rotated, dimensions);
-    encode_and_save_image(resized, destination_path, settings);
+pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, settings: &Settings) -> bool {
+    if let Some(original) = read_original_image(source_path) {
+        let orientation = orientation_from_path(source_path);
+        let rotated = rotate_image(original, orientation);
+        let dimensions = dimensions_from_settings(settings);
+        let resized = resize_image(rotated, dimensions);
+        encode_and_save_image(resized, destination_path, settings);
+
+        return true;
+    } else {
+        return false;
+    }
 }
 
-fn read_original_image(image_path: &Path) -> DynamicImage {
-    unwrap!(image::open(image_path), "Could not open the image \"{}\"", image_path.display())
+fn read_original_image(image_path: &Path) -> Option<DynamicImage> {
+    match image::open(image_path) {
+        Ok(image) => Some(image),
+        Err(e) => {
+            println!("Could not open the image \"{}\" due to \"{}\", so skipping it.", image_path.display(), e);
+            None
+        }
+    }
 }
 
 fn orientation_from_path(image_path: &Path) -> u16 {
@@ -85,7 +96,8 @@ fn encode_and_save_image(image: DynamicImage, destination_path: &Path, settings:
 }
 
 #[cfg(test)]
-pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, _settings: &Settings) {
+pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, _settings: &Settings) -> bool {
     use std::fs;
     unwrap!(fs::copy(source_path, destination_path), "Could not copy from \"{}\" to \"{}\"", source_path.display(), destination_path.display());
+    true
 }

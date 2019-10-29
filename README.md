@@ -63,18 +63,11 @@ Currently when something goes wrong, `ImageMapper` will exit and print what happ
 
 ## Compatibility
 
-Supported images:
+Platforms: Windows, Mac and Linux.
 
-- `jpg`
-- `png`
+Images: jpg and png.
 
-Supported videos:
-
-- `mov`
-- `avi`
-- `mp4`
-- `m4v`
-- `mpg`
+Videos: mov, avi, mp4, m4v and mpg.
 
 ## Credits
 

@@ -18,15 +18,19 @@ use crate::settings::{Settings, ImageQuality};
 pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, settings: &Settings) -> bool {
     if let Some(original) = read_original_image(source_path) {
         let orientation = orientation_from_path(source_path);
-        let rotated = rotate_image(original, orientation);
-        let dimensions = dimensions_from_settings(settings);
-        let resized = resize_image(rotated, dimensions);
-        encode_and_save_image(resized, destination_path, settings);
-
-        return true;
-    } else {
-        return false;
+        
+        if let Some(rotated) = rotate_image(original, orientation) {
+            let dimensions = dimensions_from_settings(settings);
+            let resized = resize_image(rotated, dimensions);
+            encode_and_save_image(resized, destination_path, settings);
+            return true;
+        }
+        else {
+            println!("Unsupported orientation for \"{}\"", source_path.display());
+        }
     }
+
+    false
 }
 
 fn read_original_image(image_path: &Path) -> Option<DynamicImage> {
@@ -57,13 +61,17 @@ fn orientation_from_path(image_path: &Path) -> u16 {
     1
 }
 
-fn rotate_image(image: DynamicImage, orientation: u16) -> DynamicImage {
+fn rotate_image(image: DynamicImage, orientation: u16) -> Option<DynamicImage> {
     match orientation {
-        1 => image,
-        6 => image.rotate90(),
-        8 => image.rotate270(),
-        3 => image.rotate180(),
-        _ => panic!("Unsupported orientation")
+        1 => Some(image),
+        2 => Some(image.fliph()),
+        3 => Some(image.rotate180()),
+        4 => Some(image.rotate180().fliph()),
+        5 => Some(image.rotate90().fliph()),
+        6 => Some(image.rotate90()),
+        7 => Some(image.rotate270().fliph()),
+        8 => Some(image.rotate270()),
+        _ => None
     }
 }
 

@@ -20,6 +20,8 @@ This program has a real use case for me. Once a week, a Raspbery Pi runs the pro
 
 ## Running
 
+**Note that files in the destination directory can be deleted, so be careful to specify the correct path.**
+
 Show the help info of `ImageMapper` by typing `cargo run -- --help` and you see the following:
 
 ```
@@ -51,7 +53,7 @@ ARGS:
                                TV]
 ```
 
-In a nutshell: supply the paths of the source and destination directories and the desired image quality. Optionally, use `-i` to copy videoes and `-v` for being verbose. Note that files in the destination directory can be deleted, so be careful to specify the correct path.
+In a nutshell: supply the paths of the source and destination directories and the desired image quality. Optionally, use `-i` to copy videoes and `-v` for being verbose.
 
 ## Building, running, testing
 

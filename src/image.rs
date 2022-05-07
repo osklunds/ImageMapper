@@ -79,6 +79,7 @@ fn dimensions_from_settings(settings: &Settings) -> (u32, u32) {
     match settings.image_quality {
         ImageQuality::Mobile => (1024, 1024),
         ImageQuality::Television => (1920, 1080),
+        ImageQuality::Thumbnail => (100, 100)
     }
 }
 
@@ -95,8 +96,9 @@ fn encode_and_save_image(image: DynamicImage, destination_path: &Path, settings:
 
     let mut file = unwrap!(File::create(destination_path), "Could not create the image \"{}\"", destination_path.display());
     let factor = match settings.image_quality {
-        ImageQuality::Mobile     => 30,
+        ImageQuality::Mobile => 30,
         ImageQuality::Television => 70,
+        ImageQuality::Thumbnail => 30
     };
 
     let mut encoder = JPEGEncoder::new_with_quality(&mut file, factor);

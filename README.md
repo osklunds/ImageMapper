@@ -48,9 +48,10 @@ ARGS:
     <destination directory>    The path to the directory where the result of the
                                mapping will be placed.
     <image quality>            Select if the images should be converted to the mobile
-                               quality (1024x1024, 30 % compression) or the TV quality
-                               (1920x1080, 70 % compression) [possible values: Mobile,
-                               TV]
+                               quality (1024x1024, 30% compression), the TV quality
+                               (1920x1080, 70% compression) or the thumbnail quality
+                               (100x100, 30% compression. [possible values: Mobile,
+                               TV, Thumbnail]
 ```
 
 In a nutshell: supply the paths of the source and destination directories and the desired image quality. Optionally, use `-i` to copy videoes and `-v` for being verbose.

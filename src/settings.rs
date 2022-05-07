@@ -12,15 +12,17 @@ pub struct Settings {
 pub enum ImageQuality {
     Mobile,
     Television,
+    Thumbnail
 }
 
 impl Settings {
     pub fn new_from_matches(matches: &ArgMatches) -> Settings {
         let image_quality = matches.value_of("image quality").unwrap();
         let image_quality = match image_quality {
-            "Mobile" => ImageQuality::Mobile,
-            "TV"     => ImageQuality::Television,
-            _        => panic!("Unknown image quality selected."),
+            "Mobile"    => ImageQuality::Mobile,
+            "TV"        => ImageQuality::Television,
+            "Thumbnail" => ImageQuality::Thumbnail,
+            _           => panic!("Unknown image quality selected."),
         };
 
         let verbose_print = matches.is_present("verbose");
@@ -75,8 +77,8 @@ fn image_quality_argument<'a>() -> Arg<'a, 'a> {
     Arg::with_name("image quality")
         .required(true)
         .takes_value(true)
-        .possible_values(&["Mobile", "TV"])
-        .help("Select if the images should be converted to the mobile quality (1024x1024, 30 % compression) or the TV quality (1920x1080, 70 % compression)")
+        .possible_values(&["Mobile", "TV", "Thumbnail"])
+        .help("Select if the images should be converted to the mobile quality (1024x1024, 30% compression), the TV quality (1920x1080, 70% compression) or the thumbnail quality (100x100, 30% compression.")
 }
 
 fn verbose_print_argument<'a>() -> Arg<'a, 'a> {

@@ -5,9 +5,8 @@ use std::fs::File;
 use std::path::Path;
 use std::io::BufReader;
 
-use image::GenericImageView;
-use image::FilterType::Gaussian;
-use image::jpeg::JPEGEncoder;
+use image::imageops::Gaussian;
+use image::codecs::jpeg::JpegEncoder;
 use image::DynamicImage;
 use unwrap::unwrap;
 use exif::{Reader, Tag, Value};
@@ -92,7 +91,7 @@ fn encode_and_save_image(image: DynamicImage, destination_path: &Path, settings:
     let color = image.color();
     let width = image.width();
     let height = image.height();
-    let pixels = image.raw_pixels();
+    let pixels = image.as_bytes();
 
     let mut file = unwrap!(File::create(destination_path), "Could not create the image \"{}\"", destination_path.display());
     let factor = match settings.image_quality {
@@ -101,7 +100,7 @@ fn encode_and_save_image(image: DynamicImage, destination_path: &Path, settings:
         ImageQuality::Thumbnail => 30
     };
 
-    let mut encoder = JPEGEncoder::new_with_quality(&mut file, factor);
+    let mut encoder = JpegEncoder::new_with_quality(&mut file, factor);
     unwrap!(encoder.encode(&pixels, width, height, color), "Could not encode the image \"{}\"", destination_path.display());
 }
 

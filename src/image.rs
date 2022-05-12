@@ -78,7 +78,7 @@ fn dimensions_from_settings(settings: &Settings) -> (u32, u32) {
     match settings.image_quality {
         ImageQuality::Mobile => (1024, 1024),
         ImageQuality::Television => (1920, 1080),
-        ImageQuality::Thumbnail => (100, 100)
+        ImageQuality::Thumbnail => (300, 300)
     }
 }
 

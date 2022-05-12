@@ -50,7 +50,7 @@ ARGS:
     <image quality>            Select if the images should be converted to the mobile
                                quality (1024x1024, 30% compression), the TV quality
                                (1920x1080, 70% compression) or the thumbnail quality
-                               (100x100, 30% compression. [possible values: Mobile,
+                               (300x300, 30% compression. [possible values: Mobile,
                                TV, Thumbnail]
 ```
 

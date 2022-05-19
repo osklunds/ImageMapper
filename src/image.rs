@@ -21,15 +21,16 @@ pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path,
         if let Some(rotated) = rotate_image(original, orientation) {
             let dimensions = dimensions_from_settings(settings);
             let resized = resize_image(rotated, dimensions);
-            encode_and_save_image(resized, destination_path, settings);
-            return true;
+            encode_and_save_image(resized, destination_path, settings)
         }
         else {
             println!("Unsupported orientation for \"{}\"", source_path.display());
+            false
         }
     }
-
-    false
+    else {
+        false
+    }
 }
 
 fn read_original_image(image_path: &Path) -> Option<DynamicImage> {
@@ -87,7 +88,7 @@ fn resize_image(image: DynamicImage, dimensions: (u32, u32)) -> DynamicImage {
     image.resize(width, height, Gaussian)
 }
 
-fn encode_and_save_image(image: DynamicImage, destination_path: &Path, settings: &Settings) {
+fn encode_and_save_image(image: DynamicImage, destination_path: &Path, settings: &Settings) -> bool {
     let color = image.color();
     let width = image.width();
     let height = image.height();
@@ -101,7 +102,16 @@ fn encode_and_save_image(image: DynamicImage, destination_path: &Path, settings:
     };
 
     let mut encoder = JpegEncoder::new_with_quality(&mut file, factor);
-    unwrap!(encoder.encode(&pixels, width, height, color), "Could not encode the image \"{}\"", destination_path.display());
+    match encoder.encode(&pixels, width, height, color) {
+        Ok(()) => {
+            true
+        },
+        Err(e) => {
+            println!("Could not convert the image \"{}\". Error \"{}\"", destination_path.display(), e);
+            let _ = std::fs::remove_file(destination_path);
+            false
+        }
+    }
 }
 
 #[cfg(test)]

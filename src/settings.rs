@@ -1,4 +1,3 @@
-
 use std::path::PathBuf;
 
 use clap::{App, AppSettings, Arg, ArgMatches};
@@ -12,17 +11,17 @@ pub struct Settings {
 pub enum ImageQuality {
     Mobile,
     Television,
-    Thumbnail
+    Thumbnail,
 }
 
 impl Settings {
     pub fn new_from_matches(matches: &ArgMatches) -> Settings {
         let image_quality = matches.value_of("image quality").unwrap();
         let image_quality = match image_quality {
-            "Mobile"    => ImageQuality::Mobile,
-            "TV"        => ImageQuality::Television,
+            "Mobile" => ImageQuality::Mobile,
+            "TV" => ImageQuality::Television,
             "Thumbnail" => ImageQuality::Thumbnail,
-            _           => panic!("Unknown image quality selected."),
+            _ => panic!("Unknown image quality selected."),
         };
 
         let verbose_print = matches.is_present("verbose");
@@ -31,13 +30,13 @@ impl Settings {
         Settings {
             image_quality: image_quality,
             verbose_print: verbose_print,
-            include_videos: include_videos
+            include_videos: include_videos,
         }
     }
 }
 
 pub fn get_matches<'a>() -> ArgMatches<'a> {
-        App::new("ImageMapper")
+    App::new("ImageMapper")
         .setting(AppSettings::DisableVersion)
         .about("Maps the source directory structure to an equivalent structure in the destination directory. The differences are: 1. Images will be downscaled and compressed. 2. Images will get their exif date/time prepended to their file names. 3. Images (and optionally videos) are the only files that will be kept.")
         .max_term_width(90)
@@ -47,7 +46,7 @@ pub fn get_matches<'a>() -> ArgMatches<'a> {
         .arg(verbose_print_argument())
         .arg(include_videos_argument())
         .get_matches()
-    }
+}
 
 fn source_path_argument<'a>() -> Arg<'a, 'a> {
     Arg::with_name("source directory")

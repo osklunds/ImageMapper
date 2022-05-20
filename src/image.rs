@@ -1,34 +1,38 @@
-
 #![allow(dead_code)]
 
 use std::fs::File;
-use std::path::Path;
 use std::io::BufReader;
+use std::path::Path;
 
-use image::imageops::Gaussian;
+use exif::{Reader, Tag, Value};
 use image::codecs::jpeg::JpegEncoder;
+use image::imageops::Gaussian;
 use image::DynamicImage;
 use unwrap::unwrap;
-use exif::{Reader, Tag, Value};
 
-use crate::settings::{Settings, ImageQuality};
+use crate::settings::{ImageQuality, Settings};
 
 #[cfg(not(test))]
-pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, settings: &Settings) -> bool {
+pub fn open_compress_and_save_image(
+    source_path: &Path,
+    destination_path: &Path,
+    settings: &Settings,
+) -> bool {
     if let Some(original) = read_original_image(source_path) {
         let orientation = orientation_from_path(source_path);
-        
+
         if let Some(rotated) = rotate_image(original, orientation) {
             let dimensions = dimensions_from_settings(settings);
             let resized = resize_image(rotated, dimensions);
             encode_and_save_image(resized, destination_path, settings)
-        }
-        else {
-            println!("Unsupported orientation for \"{}\"", source_path.display());
+        } else {
+            println!(
+                "Unsupported orientation for \"{}\"",
+                source_path.display()
+            );
             false
         }
-    }
-    else {
+    } else {
         false
     }
 }
@@ -37,19 +41,29 @@ fn read_original_image(image_path: &Path) -> Option<DynamicImage> {
     match image::open(image_path) {
         Ok(image) => Some(image),
         Err(e) => {
-            println!("Could not open the image \"{}\" due to \"{}\", so skipping it.", image_path.display(), e);
+            println!(
+                "Could not open the image \"{}\" due to \"{}\", so skipping it.",
+                image_path.display(),
+                e
+            );
             None
         }
     }
 }
 
 fn orientation_from_path(image_path: &Path) -> u16 {
-    let file = unwrap!(File::open(image_path), "Could not open the image for exif \"{}\"", image_path.display());
+    let file = unwrap!(
+        File::open(image_path),
+        "Could not open the image for exif \"{}\"",
+        image_path.display()
+    );
     let mut buf_reader = BufReader::new(&file);
     let exif_reader = Reader::new(&mut buf_reader);
 
     if let Ok(exif_reader) = exif_reader {
-        if let Some(orientation) = exif_reader.get_field(Tag::Orientation, false) {
+        if let Some(orientation) =
+            exif_reader.get_field(Tag::Orientation, false)
+        {
             if let Value::Short(orientation) = &orientation.value {
                 if orientation.len() == 1 {
                     return orientation[0];
@@ -71,7 +85,7 @@ fn rotate_image(image: DynamicImage, orientation: u16) -> Option<DynamicImage> {
         6 => Some(image.rotate90()),
         7 => Some(image.rotate270().fliph()),
         8 => Some(image.rotate270()),
-        _ => None
+        _ => None,
     }
 }
 
@@ -79,7 +93,7 @@ fn dimensions_from_settings(settings: &Settings) -> (u32, u32) {
     match settings.image_quality {
         ImageQuality::Mobile => (1024, 1024),
         ImageQuality::Television => (1920, 1080),
-        ImageQuality::Thumbnail => (300, 300)
+        ImageQuality::Thumbnail => (300, 300),
     }
 }
 
@@ -88,26 +102,36 @@ fn resize_image(image: DynamicImage, dimensions: (u32, u32)) -> DynamicImage {
     image.resize(width, height, Gaussian)
 }
 
-fn encode_and_save_image(image: DynamicImage, destination_path: &Path, settings: &Settings) -> bool {
+fn encode_and_save_image(
+    image: DynamicImage,
+    destination_path: &Path,
+    settings: &Settings,
+) -> bool {
     let color = image.color();
     let width = image.width();
     let height = image.height();
     let pixels = image.as_bytes();
 
-    let mut file = unwrap!(File::create(destination_path), "Could not create the image \"{}\"", destination_path.display());
+    let mut file = unwrap!(
+        File::create(destination_path),
+        "Could not create the image \"{}\"",
+        destination_path.display()
+    );
     let factor = match settings.image_quality {
         ImageQuality::Mobile => 30,
         ImageQuality::Television => 70,
-        ImageQuality::Thumbnail => 30
+        ImageQuality::Thumbnail => 30,
     };
 
     let mut encoder = JpegEncoder::new_with_quality(&mut file, factor);
     match encoder.encode(&pixels, width, height, color) {
-        Ok(()) => {
-            true
-        },
+        Ok(()) => true,
         Err(e) => {
-            println!("Could not convert the image \"{}\". Error \"{}\"", destination_path.display(), e);
+            println!(
+                "Could not convert the image \"{}\". Error \"{}\"",
+                destination_path.display(),
+                e
+            );
             let _ = std::fs::remove_file(destination_path);
             false
         }
@@ -115,8 +139,17 @@ fn encode_and_save_image(image: DynamicImage, destination_path: &Path, settings:
 }
 
 #[cfg(test)]
-pub fn open_compress_and_save_image(source_path: &Path, destination_path: &Path, _settings: &Settings) -> bool {
+pub fn open_compress_and_save_image(
+    source_path: &Path,
+    destination_path: &Path,
+    _settings: &Settings,
+) -> bool {
     use std::fs;
-    unwrap!(fs::copy(source_path, destination_path), "Could not copy from \"{}\" to \"{}\"", source_path.display(), destination_path.display());
+    unwrap!(
+        fs::copy(source_path, destination_path),
+        "Could not copy from \"{}\" to \"{}\"",
+        source_path.display(),
+        destination_path.display()
+    );
     true
 }

@@ -18,7 +18,7 @@ The purpose of compressing the images is so that it's faster to view and browse 
 
 `ImageMapper` has a real world use case for me. Once a week, a Raspbery Pi runs `ImageMapper` to transform our collection of family photos to the new form. We then view the transformed images on the TV. Compared to viewing the original images, we now get them in the correct order and faster loading times. In addition, I also use `ImageMapper` in conjunction with my other project [HTTPImageServer](https://github.com/osklunds/HTTPImageServer) to view and browse all images directly in my smartphone.
 
-## Running
+## Usage
 
 **Note that files in the destination directory can be deleted, so be careful to specify the correct path.**
 

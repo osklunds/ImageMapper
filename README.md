@@ -12,49 +12,21 @@ The image displays an example run
 
 ![](Example.png)
 
-The purpose of having the date/time prepended is to be able to sort images, from multiple cameras, by the time they were taken, without needing a special viewer software that can read exif tags. Windows Explorer or Finder can't sort by exif. But images transformed by `ImageMapper` become sorted by exif since the exif date/time is in the file name.
+The purpose of having the date/time prepended is to be able to sort images by the time they were taken without needing special software that can read exif tags. For example, Windows Explorer and Finder can't sort by exif. But images transformed by `ImageMapper` become sorted by exif since the exif date/time is first in the file name. This is especially useful when images come from different cameras.
 
-The purpose of compressing the images is so that it's faster to view and browse them over a network connection. On the internet as well as LANs.
+The purpose of compressing the images is so that it's faster to view and browse them over a LAN or the internet.
 
-This program has a real use case for me. Once a week, a Raspbery Pi runs the program to transform our collection of family photos to the new form. We then view the transformed, not the original, photos on the TV. Compared to viewing the original phots, we now get them in the correct order and faster loading times.
+`ImageMapper` has a real world use case for me. Once a week, a Raspbery Pi runs `ImageMapper` to transform our collection of family photos to the new form. We then view the transformed images on the TV. Compared to viewing the original images, we now get them in the correct order and faster loading times. In addition, I also use `ImageMapper` in conjunction with my other project [HTTPImageServer](https://github.com/osklunds/HTTPImageServer) to view and browse all images directly in my smartphone.
 
 ## Running
 
 **Note that files in the destination directory can be deleted, so be careful to specify the correct path.**
 
-Show the help info of `ImageMapper` by typing `cargo run -- --help` and you see the following:
+Example usage: `cargo run --release -- /my/src/path /my/dst/path TV -v`
 
-```
-ImageMapper 
-Maps the source directory structure to an equivalent structure in the destination
-directory. The differences are: 1. Images will be downscaled and compressed. 2. Images
-will get their exif date/time prepended to their file names. 3. Images (and optionally
-videos) are the only files that will be kept.
+This command will map the directory structure in `/my/src/path` to `/my/dst/path` with the `TV` quality, printing all actions.
 
-USAGE:
-    image_mapper [FLAGS] <source directory> <destination directory> <image quality>
-
-FLAGS:
-    -h, --help              Prints help information
-    -i, --include-videos    Instead of just images, with this option, videos will also be
-                            included in the destination. Note that they will just be
-                            copied as-is without any conversion.
-    -v, --verbose           Print when a directory is enterted and when a file is
-                            added/delted. No matter of this setting, errors will always be
-                            printed.
-
-ARGS:
-    <source directory>         The path to the directory that will be mapped.
-    <destination directory>    The path to the directory where the result of the
-                               mapping will be placed.
-    <image quality>            Select if the images should be converted to the mobile
-                               quality (1024x1024, 30% compression), the TV quality
-                               (1920x1080, 70% compression) or the thumbnail quality
-                               (300x300, 30% compression. [possible values: Mobile,
-                               TV, Thumbnail]
-```
-
-In a nutshell: supply the paths of the source and destination directories and the desired image quality. Optionally, use `-i` to copy videoes and `-v` for being verbose.
+For more information, type `cargo run -- --help`.
 
 ## Building, running, testing
 

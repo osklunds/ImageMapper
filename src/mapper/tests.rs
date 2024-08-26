@@ -146,7 +146,7 @@ fn test_map_directory_correctly_fills_empty_dst_with_videos() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
@@ -233,7 +233,7 @@ fn test_map_directory_correctly_fills_empty_dst_without_videos() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS_NO_VIDEO);
+    map_directory(src_path, dst_path, SETTINGS_NO_VIDEO);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, false);
 }
@@ -246,9 +246,9 @@ fn test_map_directory_removes_unwanted_src_file() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
     File::create(dst_path.join("text_file.txt")).unwrap();
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
@@ -261,9 +261,9 @@ fn test_map_directory_removes_non_existant_src_file() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
     File::create(dst_path.join("does not exist.txt")).unwrap();
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
@@ -276,9 +276,9 @@ fn test_map_directory_removes_non_existant_src_dir() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
     fs::create_dir(dst_path.join("dir4")).unwrap();
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
@@ -291,9 +291,9 @@ fn test_map_directory_removes_non_existant_src_image_double_extension() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
     File::create(dst_path.join("does not exist.jpg.jpg")).unwrap();
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
@@ -306,9 +306,9 @@ fn test_map_directory_removes_non_existant_src_image_single_extension() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
     File::create(dst_path.join("does not exist.jpg")).unwrap();
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
@@ -321,9 +321,9 @@ fn test_map_directory_removes_non_existant_src_video() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
     File::create(dst_path.join("does not exist.m4v")).unwrap();
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
@@ -336,8 +336,8 @@ fn test_map_directory_removes_existant_src_video_if_no_videos_desired() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
-    map_directory(src_path, dst_path, &SETTINGS_NO_VIDEO);
+    map_directory(src_path, dst_path, SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS_NO_VIDEO);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, false);
 }
@@ -350,12 +350,12 @@ fn test_map_directory_removes_non_existant_src_image_exif() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
     File::create(
         dst_path.join("   2001-01-01 11;22;33 does not exist.jpg.jpg"),
     )
     .unwrap();
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
@@ -368,13 +368,13 @@ fn test_map_directory_does_not_remove_correct_exif_image_in_dst() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     let file_path = &dst_path.join(SMALL_WITH_EXIF_DST_NAME);
     fs::remove_file(file_path).unwrap();
     fs::write(file_path, "some text").unwrap();
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     let recovered = fs::read_to_string(file_path).unwrap();
     assert_eq!(recovered, "some text");
@@ -388,13 +388,13 @@ fn test_map_directory_does_not_remove_correct_image_in_dst() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     let file_path = &dst_path.join("small-without-exif.jpg.jpg");
     fs::remove_file(file_path).unwrap();
     fs::write(file_path, "some text").unwrap();
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     let recovered = fs::read_to_string(file_path).unwrap();
     assert_eq!(recovered, "some text");
@@ -408,13 +408,13 @@ fn test_map_directory_does_not_remove_correct_video_in_dst() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     let file_path = &dst_path.join("video.m4v");
     fs::remove_file(file_path).unwrap();
     fs::write(file_path, "some text").unwrap();
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     let recovered = fs::read_to_string(file_path).unwrap();
     assert_eq!(recovered, "some text");
@@ -428,12 +428,12 @@ fn test_map_directory_adds_missing_image_exif() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     let file_path = &dst_path.join(SMALL_WITH_EXIF_DST_NAME);
     fs::remove_file(file_path).unwrap();
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
@@ -446,12 +446,12 @@ fn test_map_directory_adds_missing_image() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     let file_path = &dst_path.join("small-without-exif.jpg.jpg");
     fs::remove_file(file_path).unwrap();
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
@@ -464,12 +464,12 @@ fn test_map_directory_adds_missing_video() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     let file_path = &dst_path.join("video.m4v");
     fs::remove_file(file_path).unwrap();
 
-    map_directory(src_path, dst_path, &SETTINGS);
+    map_directory(src_path, dst_path, SETTINGS);
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }

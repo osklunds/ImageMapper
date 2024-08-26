@@ -14,11 +14,9 @@ mod tests;
 pub fn map_directory(
     source_path: &Path,
     destination_path: &Path,
-    settings: &Settings,
+    settings: Settings,
 ) {
-    map_directory_int(source_path,
-                      destination_path,
-                      settings)
+    map_directory_int(source_path, destination_path, &settings)
 }
 
 fn map_directory_int(

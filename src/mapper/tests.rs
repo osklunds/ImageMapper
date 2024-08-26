@@ -51,7 +51,7 @@ fn test_map_directory_correctly_fills_empty_dst_with_videos() {
 
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 #[test]
@@ -64,7 +64,7 @@ fn test_map_directory_correctly_fills_empty_dst_without_videos() {
 
     map_directory_int(src_path, dst_path, &SETTINGS_NO_VIDEO);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, false);
+    check_that_dst_structure_is_correct(dst_path, false);
 }
 
 #[test]
@@ -79,7 +79,7 @@ fn test_map_directory_removes_unwanted_src_file() {
     File::create(dst_path.join("text_file.txt")).unwrap();
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 #[test]
@@ -94,7 +94,7 @@ fn test_map_directory_removes_non_existant_src_file() {
     File::create(dst_path.join("does not exist.txt")).unwrap();
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 #[test]
@@ -109,7 +109,7 @@ fn test_map_directory_removes_non_existant_src_dir() {
     fs::create_dir(dst_path.join("dir4")).unwrap();
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 #[test]
@@ -124,7 +124,7 @@ fn test_map_directory_removes_non_existant_src_image_double_extension() {
     File::create(dst_path.join("does not exist.jpg.jpg")).unwrap();
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 #[test]
@@ -139,7 +139,7 @@ fn test_map_directory_removes_non_existant_src_image_single_extension() {
     File::create(dst_path.join("does not exist.jpg")).unwrap();
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 #[test]
@@ -154,7 +154,7 @@ fn test_map_directory_removes_non_existant_src_video() {
     File::create(dst_path.join("does not exist.m4v")).unwrap();
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 #[test]
@@ -168,7 +168,7 @@ fn test_map_directory_removes_existant_src_video_if_no_videos_desired() {
     map_directory_int(src_path, dst_path, &SETTINGS);
     map_directory_int(src_path, dst_path, &SETTINGS_NO_VIDEO);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, false);
+    check_that_dst_structure_is_correct(dst_path, false);
 }
 
 #[test]
@@ -186,7 +186,7 @@ fn test_map_directory_removes_non_existant_src_image_exif() {
     .unwrap();
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 #[test]
@@ -266,7 +266,7 @@ fn test_map_directory_adds_missing_image_exif() {
 
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 #[test]
@@ -284,7 +284,7 @@ fn test_map_directory_adds_missing_image() {
 
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 #[test]
@@ -302,7 +302,7 @@ fn test_map_directory_adds_missing_video() {
 
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 // So that the real image conversion is tested at least once
@@ -323,7 +323,7 @@ fn test_map_directory_with_image_conversion() {
 
     map_directory(src_path, dst_path, settings);
 
-    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+    check_that_dst_structure_is_correct(dst_path, true);
 }
 
 // -----------------------------------------------------------------------------
@@ -444,7 +444,7 @@ pub fn no_convert_image(
     true
 }
 
-fn check_that_dst_structure_is_correct_if_videos(
+fn check_that_dst_structure_is_correct(
     dst_path: &Path,
     videos: bool,
 ) {

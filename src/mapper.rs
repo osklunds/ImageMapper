@@ -20,7 +20,7 @@ pub fn map_directory(
         app_settings: settings,
         open_compress_and_save_image: image::open_compress_and_save_image,
     };
-    
+
     map_directory_int(source_path, destination_path, &settings)
 }
 
@@ -318,7 +318,9 @@ fn handle_destination_video(
     // The corresponding source entry must be a file, otherwise
     // it doesnt exist or is a dir.
     // We must also want to have videos in the destination.
-    if !(corresponding_source_entry_path.is_file() && settings.app_settings.include_videos) {
+    if !(corresponding_source_entry_path.is_file()
+        && settings.app_settings.include_videos)
+    {
         unwrap!(
             fs::remove_file(destination_video_path),
             "Could not delete \"{}\"",

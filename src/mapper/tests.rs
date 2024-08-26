@@ -81,7 +81,7 @@ fn check_that_dst_structure_is_correct_if_videos(
 
 fn assert_dir_items(exp_dir_items: &[&str], path: &Path) {
     let dir_items = get_dir_items(path);
-    
+
     for (exp_line, line) in std::iter::zip(exp_dir_items, &dir_items) {
         assert_eq!(exp_line, line, "exp {:?}, act {:?}", exp_line, line);
     }
@@ -101,7 +101,10 @@ fn get_dir_items(path: &Path) -> Vec<String> {
         .output()
         .expect("failed to execute process")
         .stdout;
-    std::str::from_utf8(&result).unwrap().lines().map(|s| s.to_string())
+    std::str::from_utf8(&result)
+        .unwrap()
+        .lines()
+        .map(|s| s.to_string())
         .collect()
 }
 
@@ -250,7 +253,8 @@ fn test_map_directory_does_not_remove_correct_exif_image_in_dst() {
 
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    let file_path = &dst_path.join("   2010-03-14 11;22;33 small-with-exif.jpg.jpg");
+    let file_path =
+        &dst_path.join("   2010-03-14 11;22;33 small-with-exif.jpg.jpg");
     fs::remove_file(file_path).unwrap();
     fs::write(file_path, "some text").unwrap();
 
@@ -310,7 +314,8 @@ fn test_map_directory_adds_missing_image_exif() {
 
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    let file_path = &dst_path.join("   2010-03-14 11;22;33 small-with-exif.jpg.jpg");
+    let file_path =
+        &dst_path.join("   2010-03-14 11;22;33 small-with-exif.jpg.jpg");
     fs::remove_file(file_path).unwrap();
 
     map_directory_int(src_path, dst_path, &SETTINGS);
@@ -386,13 +391,19 @@ fn create_src_structure_in_dir(path: &Path) {
     create_dir_with_name_in_dir("dir3", path);
     create_small_image_with_exif_in_dir(path);
 
-    let small_without_exif_jpg_path =
-        path.join("small-without-exif.jpg");
-    fs::copy("test_resources/small-without-exif.jpg", small_without_exif_jpg_path).unwrap();
+    let small_without_exif_jpg_path = path.join("small-without-exif.jpg");
+    fs::copy(
+        "test_resources/small-without-exif.jpg",
+        small_without_exif_jpg_path,
+    )
+    .unwrap();
 
-    let small_without_exif_png_path =
-        path.join("small-without-exif.png");
-    fs::copy("test_resources/small-without-exif.png", small_without_exif_png_path).unwrap();
+    let small_without_exif_png_path = path.join("small-without-exif.png");
+    fs::copy(
+        "test_resources/small-without-exif.png",
+        small_without_exif_png_path,
+    )
+    .unwrap();
 
     let text_file_path = path.join("text_file.txt");
     File::create(text_file_path).unwrap();
@@ -461,7 +472,7 @@ const SETTINGS: MapperSettings = MapperSettings {
         verbose_print: false,
         include_videos: true,
     },
-    open_compress_and_save_image: no_convert_image
+    open_compress_and_save_image: no_convert_image,
 };
 
 const SETTINGS_NO_VIDEO: MapperSettings = MapperSettings {
@@ -470,7 +481,7 @@ const SETTINGS_NO_VIDEO: MapperSettings = MapperSettings {
         verbose_print: false,
         include_videos: false,
     },
-    open_compress_and_save_image: no_convert_image
+    open_compress_and_save_image: no_convert_image,
 };
 
 pub fn no_convert_image(
@@ -486,4 +497,3 @@ pub fn no_convert_image(
     );
     true
 }
-

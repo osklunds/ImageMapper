@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 
-use exif::{Reader, Tag, Value, In};
+use exif::{In, Reader, Tag, Value};
 use image::codecs::jpeg::JpegEncoder;
 use image::imageops::Gaussian;
 use image::DynamicImage;

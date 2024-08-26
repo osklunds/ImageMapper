@@ -28,19 +28,22 @@ pub fn map_directory(
     if !destination_path.is_dir() {
         return Err(MapperError::DstDoesNotExist);
     }
-    let canon_source_path = fs::canonicalize(source_path).unwrap();
-    let canon_destination_path = fs::canonicalize(destination_path).unwrap();
-
-    if canon_source_path.starts_with(&canon_destination_path) {
+    if is_path_subdir_of(&source_path, &destination_path) {
         return Err(MapperError::SrcInsideDst);
     }
-    if canon_destination_path.starts_with(&canon_source_path) {
+    if is_path_subdir_of(&destination_path, &source_path) {
         return Err(MapperError::DstInsideSrc);
     }
 
     map_directory_int(source_path, destination_path, &settings);
 
     Ok(())
+}
+
+fn is_path_subdir_of(path_to_check: &Path, path_to_compare: &Path) -> bool {
+    let path_to_check = fs::canonicalize(path_to_check).unwrap();
+    let path_to_compare = fs::canonicalize(path_to_compare).unwrap();
+    path_to_check.starts_with(&path_to_compare)
 }
 
 fn map_directory_int(

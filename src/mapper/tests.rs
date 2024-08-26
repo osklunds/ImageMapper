@@ -127,6 +127,9 @@ const SMALL_WITHOUT_EXIF_PNG_NAME: &str = "small-without-exif.png";
 const SMALL_WITHOUT_EXIF_PNG_PATH: &str =
     "test_resources/small-without-exif.png";
 
+const SMALL_WITH_EXIF_DST_NAME: &str =
+    "   2010-03-14 11;22;33 small-with-exif.jpg.jpg";
+
 const SETTINGS: MapperSettings = MapperSettings {
     app_settings: Settings {
         image_quality: ImageQuality::Mobile,
@@ -221,55 +224,6 @@ fn get_dir_items(path: &Path) -> String {
         .expect("failed to execute process")
         .stdout;
     std::str::from_utf8(&result).unwrap().to_string()
-}
-
-fn check_dir1(dst_path: &Path) {
-    let dir1_path = &dst_path.join("dir1");
-    assert!(dir1_path.exists());
-
-    assert!(dir1_path.join(SMALL_WITH_EXIF_DST_NAME).exists());
-
-    assert_eq!(fs::read_dir(dir1_path).unwrap().count(), 1);
-}
-
-const SMALL_WITH_EXIF_DST_NAME: &str =
-    "   2010-03-14 11;22;33 small-with-exif.jpg.jpg";
-
-fn check_dir2(dst_path: &Path) {
-    let dir2_path = dst_path.join("dir2");
-    assert!(dir2_path.exists());
-
-    check_subdir1(&dir2_path);
-    check_subdir2(&dir2_path);
-    assert!(dst_path
-        .join("dir2")
-        .join(SMALL_WITH_EXIF_DST_NAME)
-        .exists());
-
-    assert_eq!(fs::read_dir(dir2_path).unwrap().count(), 3);
-}
-
-fn check_subdir1(dir2_path: &Path) {
-    let subdir1_path = dir2_path.join("subdir1");
-
-    assert!(subdir1_path.exists());
-    assert!(subdir1_path.join(SMALL_WITH_EXIF_DST_NAME).exists());
-
-    assert_eq!(fs::read_dir(subdir1_path).unwrap().count(), 1);
-}
-
-fn check_subdir2(dir2_path: &Path) {
-    let subdir2_path = dir2_path.join("subdir2");
-    assert!(subdir2_path.exists());
-
-    assert_eq!(fs::read_dir(subdir2_path).unwrap().count(), 0);
-}
-
-fn check_dir3(dst_path: &Path) {
-    let dir3_path = dst_path.join("dir3");
-    assert!(dir3_path.exists());
-
-    assert_eq!(fs::read_dir(dir3_path).unwrap().count(), 0);
 }
 
 #[test]

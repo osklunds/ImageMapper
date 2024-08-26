@@ -309,22 +309,34 @@ fn test_map_directory_adds_missing_video() {
 // So that the real image conversion is tested at least once
 #[test]
 fn test_map_directory_with_image_conversion() {
-    let src_dir = tempdir();
-    let src_path = &src_dir.path();
-    let dst_dir = tempdir();
-    let dst_path = &dst_dir.path();
+    for image_quality in [
+        ImageQuality::Thumbnail,
+        ImageQuality::Mobile,
+        ImageQuality::Television,
+    ] {
+        let src_dir = tempdir();
+        let src_path = &src_dir.path();
+        let dst_dir = tempdir();
+        let dst_path = &dst_dir.path();
 
-    create_src_structure_in_dir(src_path);
+        let image_path = src_path.join("small-with-exif.jpg");
+        fs::copy("test_resources/small-with-exif.jpg", image_path).unwrap();
 
-    let settings = Settings {
-        image_quality: ImageQuality::Mobile,
-        verbose_print: false,
-        include_videos: true,
-    };
+        let exp_src_items = vec!["small-with-exif.jpg"];
+        assert_dir_items(&exp_src_items, src_path);
 
-    map_directory(src_path, dst_path, settings);
+        let settings = Settings {
+            image_quality,
+            verbose_print: false,
+            include_videos: true,
+        };
 
-    check_that_dst_structure_is_correct(dst_path, true);
+        map_directory(src_path, dst_path, settings);
+
+        let exp_dst_items =
+            vec!["   2010-03-14 11;22;33 small-with-exif.jpg.jpg"];
+        assert_dir_items(&exp_dst_items, dst_path);
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -445,10 +457,7 @@ pub fn no_convert_image(
     true
 }
 
-fn check_that_dst_structure_is_correct(
-    dst_path: &Path,
-    videos: bool,
-) {
+fn check_that_dst_structure_is_correct(dst_path: &Path, videos: bool) {
     let mut exp_dir_items = vec![
         "   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
         "dir1",

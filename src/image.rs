@@ -136,19 +136,3 @@ fn encode_and_save_image(
         }
     }
 }
-
-// #[cfg(test)]
-// pub fn open_compress_and_save_image(
-//     source_path: &Path,
-//     destination_path: &Path,
-//     _settings: &Settings,
-// ) -> bool {
-//     use std::fs;
-//     unwrap!(
-//         fs::copy(source_path, destination_path),
-//         "Could not copy from \"{}\" to \"{}\"",
-//         source_path.display(),
-//         destination_path.display()
-//     );
-//     true
-// }

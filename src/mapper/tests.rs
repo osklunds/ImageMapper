@@ -54,60 +54,6 @@ fn test_map_directory_correctly_fills_empty_dst_with_videos() {
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
 
-fn check_that_dst_structure_is_correct_if_videos(
-    dst_path: &Path,
-    videos: bool,
-) {
-    let mut exp_dir_items = vec![
-        "   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
-        "dir1",
-        "dir1/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
-        "dir2",
-        "dir2/subdir1",
-        "dir2/subdir1/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
-        "dir2/subdir2",
-        "dir2/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
-        "dir3",
-        "small-without-exif.jpg.jpg",
-        "small-without-exif.png.jpg",
-    ];
-
-    if videos {
-        exp_dir_items.push("video.m4v");
-    }
-
-    assert_dir_items(&exp_dir_items, dst_path);
-}
-
-fn assert_dir_items(exp_dir_items: &[&str], path: &Path) {
-    let dir_items = get_dir_items(path);
-
-    for (exp_line, line) in std::iter::zip(exp_dir_items, &dir_items) {
-        assert_eq!(exp_line, line, "exp {:?}, act {:?}", exp_line, line);
-    }
-
-    // Check length for debuggability
-    assert_eq!(exp_dir_items.len(), dir_items.len());
-
-    // Then check all as an extra check if the above checks are buggy
-    assert_eq!(exp_dir_items, dir_items);
-}
-
-fn get_dir_items(path: &Path) -> Vec<String> {
-    let result = Command::new("bash")
-        .arg("-c")
-        .arg("find *")
-        .current_dir(path)
-        .output()
-        .expect("failed to execute process")
-        .stdout;
-    std::str::from_utf8(&result)
-        .unwrap()
-        .lines()
-        .map(|s| s.to_string())
-        .collect()
-}
-
 #[test]
 fn test_map_directory_correctly_fills_empty_dst_without_videos() {
     let src_dir = tempfile::tempdir().unwrap();
@@ -496,4 +442,58 @@ pub fn no_convert_image(
         destination_path.display()
     );
     true
+}
+
+fn check_that_dst_structure_is_correct_if_videos(
+    dst_path: &Path,
+    videos: bool,
+) {
+    let mut exp_dir_items = vec![
+        "   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
+        "dir1",
+        "dir1/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
+        "dir2",
+        "dir2/subdir1",
+        "dir2/subdir1/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
+        "dir2/subdir2",
+        "dir2/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
+        "dir3",
+        "small-without-exif.jpg.jpg",
+        "small-without-exif.png.jpg",
+    ];
+
+    if videos {
+        exp_dir_items.push("video.m4v");
+    }
+
+    assert_dir_items(&exp_dir_items, dst_path);
+}
+
+fn assert_dir_items(exp_dir_items: &[&str], path: &Path) {
+    let dir_items = get_dir_items(path);
+
+    for (exp_line, line) in std::iter::zip(exp_dir_items, &dir_items) {
+        assert_eq!(exp_line, line, "exp {:?}, act {:?}", exp_line, line);
+    }
+
+    // Check length for debuggability
+    assert_eq!(exp_dir_items.len(), dir_items.len());
+
+    // Then check all as an extra check if the above checks are buggy
+    assert_eq!(exp_dir_items, dir_items);
+}
+
+fn get_dir_items(path: &Path) -> Vec<String> {
+    let result = Command::new("bash")
+        .arg("-c")
+        .arg("find *")
+        .current_dir(path)
+        .output()
+        .expect("failed to execute process")
+        .stdout;
+    std::str::from_utf8(&result)
+        .unwrap()
+        .lines()
+        .map(|s| s.to_string())
+        .collect()
 }

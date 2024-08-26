@@ -41,46 +41,47 @@ fn test_ensure_path_is_directory_does_not_remove_directory() {
     assert!(destination_file.exists());
 }
 
-/*
-dir_path
-    dir1
-        small-with-exif.jpg
-    dir2
-        subdir1
-            small-with-exif.jpg
-        subdir2
-        small-with-exif.jpg
-    dir3
-    small-with-exif.jpg
-    small-without-exif.jpg
-    small-without-exif.png
-    text_file.txt
-    word.docx
-    video.m4v
-*/
-fn create_src_structure_in_dir(dir_path: &Path) {
-    create_dir1_in_dir(dir_path);
-    create_dir2_in_dir(dir_path);
+fn create_src_structure_in_dir(path: &Path) {
+    create_dir1_in_dir(path);
+    create_dir2_in_dir(path);
 
-    create_dir_with_name_in_dir("dir3", dir_path);
-    create_small_image_with_exif_in_dir(dir_path);
+    create_dir_with_name_in_dir("dir3", path);
+    create_small_image_with_exif_in_dir(path);
 
     let small_without_exif_jpg_path =
-        dir_path.join(SMALL_WITHOUT_EXIF_JPG_NAME);
+        path.join(SMALL_WITHOUT_EXIF_JPG_NAME);
     fs::copy(SMALL_WITHOUT_EXIF_JPG_PATH, small_without_exif_jpg_path).unwrap();
 
     let small_without_exif_png_path =
-        dir_path.join(SMALL_WITHOUT_EXIF_PNG_NAME);
+        path.join(SMALL_WITHOUT_EXIF_PNG_NAME);
     fs::copy(SMALL_WITHOUT_EXIF_PNG_PATH, small_without_exif_png_path).unwrap();
 
-    let text_file_path = dir_path.join("text_file.txt");
+    let text_file_path = path.join("text_file.txt");
     File::create(text_file_path).unwrap();
 
-    let word_path = dir_path.join("word.docx");
+    let word_path = path.join("word.docx");
     File::create(word_path).unwrap();
 
-    let movie_path = dir_path.join("video.m4v");
+    let movie_path = path.join("video.m4v");
     File::create(movie_path).unwrap();
+
+    let exp_dir_items = vec![
+        "dir1",
+        "dir1/small-with-exif.jpg",
+        "dir2",
+        "dir2/subdir1",
+        "dir2/subdir1/small-with-exif.jpg",
+        "dir2/subdir2",
+        "dir2/small-with-exif.jpg",
+        "dir3",
+        "small-with-exif.jpg",
+        "small-without-exif.jpg",
+        "small-without-exif.png",
+        "text_file.txt",
+        "video.m4v",
+        "word.docx",
+    ];
+    assert_dir_items(&exp_dir_items, path);
 }
 
 fn create_dir1_in_dir(dir_path: &Path) {
@@ -202,10 +203,9 @@ fn check_that_dst_structure_is_correct_if_videos(
 
 fn assert_dir_items(exp_dir_items: &[&str], path: &Path) {
     let dir_items = get_dir_items(path);
-    let dir_items: Vec<&str> = dir_items.lines().collect();
     
     for (exp_line, line) in std::iter::zip(exp_dir_items, &dir_items) {
-        assert_eq!(exp_line, line);
+        assert_eq!(exp_line, line, "exp {:?}, act {:?}", exp_line, line);
     }
 
     // Check length for debuggability
@@ -215,7 +215,7 @@ fn assert_dir_items(exp_dir_items: &[&str], path: &Path) {
     assert_eq!(exp_dir_items, dir_items);
 }
 
-fn get_dir_items(path: &Path) -> String {
+fn get_dir_items(path: &Path) -> Vec<String> {
     let result = Command::new("bash")
         .arg("-c")
         .arg("find *")
@@ -223,7 +223,8 @@ fn get_dir_items(path: &Path) -> String {
         .output()
         .expect("failed to execute process")
         .stdout;
-    std::str::from_utf8(&result).unwrap().to_string()
+    std::str::from_utf8(&result).unwrap().lines().map(|s| s.to_string())
+        .collect()
 }
 
 #[test]

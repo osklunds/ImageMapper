@@ -379,10 +379,26 @@ fn test_source_does_not_exist() {
 
     let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
+    assert!(dst_path.is_dir());
 
     let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
 
     assert_eq!(Err(MapperError::SrcDoesNotExist), result);
+}
+
+#[test]
+fn test_destination_does_not_exist() {
+    let src_dir = tempdir();
+    let src_path = &src_dir.path();
+    assert!(src_path.is_dir());
+
+    let dst_dir = tempdir();
+    let mut dst_path = dst_dir.path().to_path_buf();
+    dst_path.push("does_not_exist");
+
+    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
+
+    assert_eq!(Err(MapperError::DstDoesNotExist), result);
 }
 
 // -----------------------------------------------------------------------------

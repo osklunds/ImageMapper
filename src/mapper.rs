@@ -31,10 +31,10 @@ pub fn map_directory(
     let canon_source_path = fs::canonicalize(source_path).unwrap();
     let canon_destination_path = fs::canonicalize(destination_path).unwrap();
 
-    if canon_source_path.starts_with(&destination_path) {
+    if canon_source_path.starts_with(&canon_destination_path) {
         return Err(MapperError::SrcInsideDst);
     }
-    if canon_destination_path.starts_with(&source_path) {
+    if canon_destination_path.starts_with(&canon_source_path) {
         return Err(MapperError::DstInsideSrc);
     }
 

@@ -416,11 +416,14 @@ fn test_destination_dir_inside_source_dir() {
 
 #[test]
 fn test_source_dir_inside_destination_dir() {
-    let dst_dir = tempdir();
-    let dst_path = &dst_dir.path();
+    let root_dir = tempdir();
+    let root_path = root_dir.path();
 
-    let src_path = dst_path.join("subdir");
-    fs::create_dir(&src_path).unwrap();
+    let src_path = root_path.join("a").join("b");
+    let dst_path = root_path.join("c").join("..").join("a");
+
+    fs::create_dir_all(&src_path).unwrap();
+    fs::create_dir_all(&dst_path).unwrap();
 
     let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
 

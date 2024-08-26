@@ -16,6 +16,16 @@ pub fn map_directory(
     destination_path: &Path,
     settings: &Settings,
 ) {
+    map_directory_int(source_path,
+                      destination_path,
+                      settings)
+}
+
+fn map_directory_int(
+    source_path: &Path,
+    destination_path: &Path,
+    settings: &Settings,
+) {
     if settings.verbose_print {
         println!(
             "Entered source: \"{}\" and destination: \"{}\"",
@@ -88,7 +98,7 @@ fn handle_source_dir(
     );
     let destination_dir_path = &destination_path.join(source_dir_name);
 
-    map_directory(source_dir_path, destination_dir_path, settings);
+    map_directory_int(source_dir_path, destination_dir_path, settings);
 }
 
 fn handle_source_file(
@@ -220,7 +230,7 @@ fn handle_destination_dir(
             println!("Deleted \"{}\"", destination_dir_path.display());
         }
     }
-    // No need to recursively call map_directory. If a destination dir
+    // No need to recursively call map_directory_int. If a destination dir
     // has a name that matches the source dir, then it will already have
     // been iterated in the source phase.
 }

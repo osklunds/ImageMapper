@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 
-use exif::{Reader, Tag, Value};
+use exif::{Reader, Tag, Value, In};
 use image::codecs::jpeg::JpegEncoder;
 use image::imageops::Gaussian;
 use image::DynamicImage;
@@ -57,11 +57,11 @@ fn orientation_from_path(image_path: &Path) -> u16 {
         image_path.display()
     );
     let mut buf_reader = BufReader::new(&file);
-    let exif_reader = Reader::new(&mut buf_reader);
+    let exif_reader = Reader::new();
 
-    if let Ok(exif_reader) = exif_reader {
+    if let Ok(exif_reader) = exif_reader.read_from_container(&mut buf_reader) {
         if let Some(orientation) =
-            exif_reader.get_field(Tag::Orientation, false)
+            exif_reader.get_field(Tag::Orientation, In::PRIMARY)
         {
             if let Value::Short(orientation) = &orientation.value {
                 if orientation.len() == 1 {

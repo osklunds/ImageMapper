@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 
-use exif::Tag;
+use exif::{Tag, In};
 use unwrap::unwrap;
 
 pub fn extension_is_image_extension(extension: &OsStr) -> bool {
@@ -74,10 +74,10 @@ fn date_time_string_from_image_path(image_path: &Path) -> String {
         "Could not open the image \"{}\"",
         image_path.display()
     );
-    let reader = exif::Reader::new(&mut BufReader::new(&file));
+    let reader = exif::Reader::new();
 
-    if let Ok(r) = reader {
-        if let Some(date_time) = r.get_field(Tag::DateTimeOriginal, false) {
+    if let Ok(r) = reader.read_from_container(&mut BufReader::new(&file)) {
+        if let Some(date_time) = r.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
             return format!(
                 "{}",
                 date_time.value.display_as(Tag::DateTimeOriginal)

@@ -345,3 +345,8 @@ fn handle_destination_extensionless_file(
         println!("Deleted \"{}\"", destination_file_path.display());
     }
 }
+
+struct MapperSettings {
+    app_settings: Settings,
+    open_compress_and_save_image: fn(&Path, &Path, &Settings) -> bool,
+}

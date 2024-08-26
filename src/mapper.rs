@@ -1,6 +1,7 @@
 use std::fs;
 use std::fs::ReadDir;
 use std::path::Path;
+use std::result::Result;
 
 use unwrap::unwrap;
 
@@ -15,13 +16,31 @@ pub fn map_directory(
     source_path: &Path,
     destination_path: &Path,
     settings: Settings,
-) {
+) -> Result<(), MapperError> {
     let settings = MapperSettings {
         app_settings: settings,
         open_compress_and_save_image: image::open_compress_and_save_image,
     };
 
-    map_directory_int(source_path, destination_path, &settings)
+    if !source_path.is_dir() {
+        return Err(MapperError::SrcDoesNotExist);
+    }
+    if !destination_path.is_dir() {
+        return Err(MapperError::DstDoesNotExist);
+    }
+    let canon_source_path = fs::canonicalize(source_path).unwrap();
+    let canon_destination_path = fs::canonicalize(destination_path).unwrap();
+
+    if canon_source_path.starts_with(&destination_path) {
+        return Err(MapperError::SrcInsideDst);
+    }
+    if canon_destination_path.starts_with(&source_path) {
+        return Err(MapperError::DstInsideSrc);
+    }
+
+    map_directory_int(source_path, destination_path, &settings);
+
+    Ok(())
 }
 
 fn map_directory_int(
@@ -364,4 +383,13 @@ fn handle_destination_extensionless_file(
 struct MapperSettings {
     app_settings: Settings,
     open_compress_and_save_image: fn(&Path, &Path, &Settings) -> bool,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum MapperError {
+    SrcDoesNotExist,
+    DstDoesNotExist,
+    SrcInsideDst,
+    DstInsideSrc,
+    // DstTopLevelDirNotInSrc,
 }

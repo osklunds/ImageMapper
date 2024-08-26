@@ -2,6 +2,7 @@ use super::*;
 
 use std::fs::File;
 use std::path::PathBuf;
+use std::process::Command;
 
 use crate::settings::ImageQuality;
 
@@ -175,25 +176,51 @@ fn check_that_dst_structure_is_correct_if_videos(
     dst_path: &Path,
     videos: bool,
 ) {
-    check_dir1(dst_path);
-    check_dir2(dst_path);
-    check_dir3(dst_path);
-
-    assert!(dst_path.join("dir3").exists());
-    assert!(dst_path.join(SMALL_WITH_EXIF_DST_NAME).exists());
-    assert!(dst_path.join("small-without-exif.jpg.jpg").exists());
-    assert!(dst_path.join("small-without-exif.png.jpg").exists());
+    let mut exp_dir_items = vec![
+        "   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
+        "dir1",
+        "dir1/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
+        "dir2",
+        "dir2/subdir1",
+        "dir2/subdir1/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
+        "dir2/subdir2",
+        "dir2/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
+        "dir3",
+        "small-without-exif.jpg.jpg",
+        "small-without-exif.png.jpg",
+    ];
 
     if videos {
-        assert!(dst_path.join("video.m4v").exists());
+        exp_dir_items.push("video.m4v");
     }
 
-    let entry_count = match videos {
-        true => 7,
-        false => 6,
-    };
+    assert_dir_items(&exp_dir_items, dst_path);
+}
 
-    assert_eq!(fs::read_dir(dst_path).unwrap().count(), entry_count);
+fn assert_dir_items(exp_dir_items: &[&str], path: &Path) {
+    let dir_items = get_dir_items(path);
+    let dir_items: Vec<&str> = dir_items.lines().collect();
+    
+    for (exp_line, line) in std::iter::zip(exp_dir_items, &dir_items) {
+        assert_eq!(exp_line, line);
+    }
+
+    // Check length for debuggability
+    assert_eq!(exp_dir_items.len(), dir_items.len());
+
+    // Then check all as an extra check if the above checks are buggy
+    assert_eq!(exp_dir_items, dir_items);
+}
+
+fn get_dir_items(path: &Path) -> String {
+    let result = Command::new("bash")
+        .arg("-c")
+        .arg("find *")
+        .current_dir(path)
+        .output()
+        .expect("failed to execute process")
+        .stdout;
+    std::str::from_utf8(&result).unwrap().to_string()
 }
 
 fn check_dir1(dst_path: &Path) {

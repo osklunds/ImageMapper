@@ -419,7 +419,8 @@ fn test_source_dir_inside_destination_dir() {
     let root_dir = tempdir();
     let root_path = root_dir.path();
 
-    let src_path = root_path.join("a").join("b");
+    // So that canonicalize is tested
+    let src_path = root_path.join("d").join("..").join("a").join("b");
     let dst_path = root_path.join("c").join("..").join("a");
 
     fs::create_dir_all(&src_path).unwrap();

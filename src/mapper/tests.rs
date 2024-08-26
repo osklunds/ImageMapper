@@ -69,6 +69,36 @@ fn test_map_directory_correctly_fills_empty_dst_without_videos() {
 }
 
 #[test]
+fn test_map_directory_dst_already_correct() {
+    let src_dir = tempdir();
+    let src_path = &src_dir.path();
+    let dst_dir = tempdir();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    let src_items_before = get_dir_items(src_path);
+    let dst_items_before = get_dir_items(dst_path);
+
+    map_directory_int(src_path, dst_path, &SETTINGS);
+
+    let src_items_between = get_dir_items(src_path);
+    let dst_items_between = get_dir_items(dst_path);
+
+    map_directory_int(src_path, dst_path, &SETTINGS);
+
+    check_that_dst_structure_is_correct(dst_path, true);
+
+    let src_items_after = get_dir_items(src_path);
+    let dst_items_after = get_dir_items(dst_path);
+
+    assert_eq!(src_items_before, src_items_between);
+    assert_eq!(src_items_between, src_items_after);
+
+    assert_ne!(dst_items_before, dst_items_between);
+    assert_eq!(dst_items_between, dst_items_after);
+}
+
+#[test]
 fn test_map_directory_removes_unwanted_src_file() {
     let src_dir = tempdir();
     let src_path = &src_dir.path();

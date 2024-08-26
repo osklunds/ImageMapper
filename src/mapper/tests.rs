@@ -414,6 +414,19 @@ fn test_destination_dir_inside_source_dir() {
     assert_eq!(Err(MapperError::DstInsideSrc), result);
 }
 
+#[test]
+fn test_source_dir_inside_destination_dir() {
+    let dst_dir = tempdir();
+    let dst_path = &dst_dir.path();
+
+    let src_path = dst_path.join("subdir");
+    fs::create_dir(&src_path).unwrap();
+
+    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
+
+    assert_eq!(Err(MapperError::SrcInsideDst), result);
+}
+
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------

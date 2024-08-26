@@ -493,3 +493,24 @@ fn test_map_directory_adds_missing_video() {
 
     check_that_dst_structure_is_correct_if_videos(dst_path, true);
 }
+
+// So that the real image conversion is tested at least once
+#[test]
+fn test_map_directory_with_image_conversion() {
+    let src_dir = tempfile::tempdir().unwrap();
+    let src_path = &src_dir.path();
+    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_path = &dst_dir.path();
+
+    create_src_structure_in_dir(src_path);
+
+    let settings = Settings {
+        image_quality: ImageQuality::Mobile,
+        verbose_print: false,
+        include_videos: true,
+    };
+
+    map_directory(src_path, dst_path, settings);
+
+    check_that_dst_structure_is_correct_if_videos(dst_path, true);
+}

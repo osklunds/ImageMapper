@@ -401,6 +401,19 @@ fn test_destination_does_not_exist() {
     assert_eq!(Err(MapperError::DstDoesNotExist), result);
 }
 
+#[test]
+fn test_destination_dir_inside_source_dir() {
+    let src_dir = tempdir();
+    let src_path = &src_dir.path();
+
+    let dst_path = src_path.join("subdir");
+    fs::create_dir(&dst_path).unwrap();
+
+    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
+
+    assert_eq!(Err(MapperError::DstInsideSrc), result);
+}
+
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------

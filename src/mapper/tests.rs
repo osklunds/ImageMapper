@@ -49,12 +49,12 @@ fn create_src_structure_in_dir(path: &Path) {
     create_small_image_with_exif_in_dir(path);
 
     let small_without_exif_jpg_path =
-        path.join(SMALL_WITHOUT_EXIF_JPG_NAME);
-    fs::copy(SMALL_WITHOUT_EXIF_JPG_PATH, small_without_exif_jpg_path).unwrap();
+        path.join("small-without-exif.jpg");
+    fs::copy("test_resources/small-without-exif.jpg", small_without_exif_jpg_path).unwrap();
 
     let small_without_exif_png_path =
-        path.join(SMALL_WITHOUT_EXIF_PNG_NAME);
-    fs::copy(SMALL_WITHOUT_EXIF_PNG_PATH, small_without_exif_png_path).unwrap();
+        path.join("small-without-exif.png");
+    fs::copy("test_resources/small-without-exif.png", small_without_exif_png_path).unwrap();
 
     let text_file_path = path.join("text_file.txt");
     File::create(text_file_path).unwrap();
@@ -96,8 +96,8 @@ fn create_dir_with_name_in_dir(name: &str, dir_path: &Path) -> PathBuf {
 }
 
 fn create_small_image_with_exif_in_dir(dir_path: &Path) {
-    let image_path = dir_path.join(SMALL_WITH_EXIF_JPG_NAME);
-    fs::copy(SMALL_WITH_EXIF_JPG_PATH, image_path).unwrap();
+    let image_path = dir_path.join("small-with-exif.jpg");
+    fs::copy("test_resources/small-with-exif.jpg", image_path).unwrap();
 }
 
 fn create_dir2_in_dir(dir_path: &Path) {
@@ -116,20 +116,6 @@ fn create_subdir1_in_dir(dir_path: &Path) {
 fn create_subdir2_in_dir(dir_path: &Path) {
     create_dir_with_name_in_dir("subdir2", dir_path);
 }
-
-const SMALL_WITH_EXIF_JPG_NAME: &str = "small-with-exif.jpg";
-const SMALL_WITH_EXIF_JPG_PATH: &str = "test_resources/small-with-exif.jpg";
-
-const SMALL_WITHOUT_EXIF_JPG_NAME: &str = "small-without-exif.jpg";
-const SMALL_WITHOUT_EXIF_JPG_PATH: &str =
-    "test_resources/small-without-exif.jpg";
-
-const SMALL_WITHOUT_EXIF_PNG_NAME: &str = "small-without-exif.png";
-const SMALL_WITHOUT_EXIF_PNG_PATH: &str =
-    "test_resources/small-without-exif.png";
-
-const SMALL_WITH_EXIF_DST_NAME: &str =
-    "   2010-03-14 11;22;33 small-with-exif.jpg.jpg";
 
 const SETTINGS: MapperSettings = MapperSettings {
     app_settings: Settings {
@@ -372,7 +358,7 @@ fn test_map_directory_does_not_remove_correct_exif_image_in_dst() {
 
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    let file_path = &dst_path.join(SMALL_WITH_EXIF_DST_NAME);
+    let file_path = &dst_path.join("   2010-03-14 11;22;33 small-with-exif.jpg.jpg");
     fs::remove_file(file_path).unwrap();
     fs::write(file_path, "some text").unwrap();
 
@@ -432,7 +418,7 @@ fn test_map_directory_adds_missing_image_exif() {
 
     map_directory_int(src_path, dst_path, &SETTINGS);
 
-    let file_path = &dst_path.join(SMALL_WITH_EXIF_DST_NAME);
+    let file_path = &dst_path.join("   2010-03-14 11;22;33 small-with-exif.jpg.jpg");
     fs::remove_file(file_path).unwrap();
 
     map_directory_int(src_path, dst_path, &SETTINGS);

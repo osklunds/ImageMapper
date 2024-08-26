@@ -3,12 +3,13 @@ use super::*;
 use std::fs::File;
 use std::path::PathBuf;
 use std::process::Command;
+use tempfile::TempDir;
 
 use crate::settings::ImageQuality;
 
 #[test]
 fn test_ensure_path_is_directory_removes_file() {
-    let temp_dir = tempfile::tempdir().unwrap();
+    let temp_dir = tempdir();
     let destination_path = &temp_dir.path().join("dst");
     File::create(destination_path).unwrap();
 
@@ -19,7 +20,7 @@ fn test_ensure_path_is_directory_removes_file() {
 
 #[test]
 fn test_ensure_path_is_directory_adds_directory() {
-    let temp_dir = tempfile::tempdir().unwrap();
+    let temp_dir = tempdir();
     let destination_path = &temp_dir.path().join("dst");
 
     ensure_path_is_directory(destination_path);
@@ -29,7 +30,7 @@ fn test_ensure_path_is_directory_adds_directory() {
 
 #[test]
 fn test_ensure_path_is_directory_does_not_remove_directory() {
-    let temp_dir = tempfile::tempdir().unwrap();
+    let temp_dir = tempdir();
     let destination_path = &temp_dir.path().join("dst");
 
     fs::create_dir(destination_path).unwrap();
@@ -43,9 +44,9 @@ fn test_ensure_path_is_directory_does_not_remove_directory() {
 
 #[test]
 fn test_map_directory_correctly_fills_empty_dst_with_videos() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -56,9 +57,9 @@ fn test_map_directory_correctly_fills_empty_dst_with_videos() {
 
 #[test]
 fn test_map_directory_correctly_fills_empty_dst_without_videos() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -69,9 +70,9 @@ fn test_map_directory_correctly_fills_empty_dst_without_videos() {
 
 #[test]
 fn test_map_directory_removes_unwanted_src_file() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -84,9 +85,9 @@ fn test_map_directory_removes_unwanted_src_file() {
 
 #[test]
 fn test_map_directory_removes_non_existant_src_file() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -99,9 +100,9 @@ fn test_map_directory_removes_non_existant_src_file() {
 
 #[test]
 fn test_map_directory_removes_non_existant_src_dir() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -114,9 +115,9 @@ fn test_map_directory_removes_non_existant_src_dir() {
 
 #[test]
 fn test_map_directory_removes_non_existant_src_image_double_extension() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -129,9 +130,9 @@ fn test_map_directory_removes_non_existant_src_image_double_extension() {
 
 #[test]
 fn test_map_directory_removes_non_existant_src_image_single_extension() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -144,9 +145,9 @@ fn test_map_directory_removes_non_existant_src_image_single_extension() {
 
 #[test]
 fn test_map_directory_removes_non_existant_src_video() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -159,9 +160,9 @@ fn test_map_directory_removes_non_existant_src_video() {
 
 #[test]
 fn test_map_directory_removes_existant_src_video_if_no_videos_desired() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -173,9 +174,9 @@ fn test_map_directory_removes_existant_src_video_if_no_videos_desired() {
 
 #[test]
 fn test_map_directory_removes_non_existant_src_image_exif() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -191,9 +192,9 @@ fn test_map_directory_removes_non_existant_src_image_exif() {
 
 #[test]
 fn test_map_directory_does_not_remove_correct_exif_image_in_dst() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -212,9 +213,9 @@ fn test_map_directory_does_not_remove_correct_exif_image_in_dst() {
 
 #[test]
 fn test_map_directory_does_not_remove_correct_image_in_dst() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -232,9 +233,9 @@ fn test_map_directory_does_not_remove_correct_image_in_dst() {
 
 #[test]
 fn test_map_directory_does_not_remove_correct_video_in_dst() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -252,9 +253,9 @@ fn test_map_directory_does_not_remove_correct_video_in_dst() {
 
 #[test]
 fn test_map_directory_adds_missing_image_exif() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -271,9 +272,9 @@ fn test_map_directory_adds_missing_image_exif() {
 
 #[test]
 fn test_map_directory_adds_missing_image() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -289,9 +290,9 @@ fn test_map_directory_adds_missing_image() {
 
 #[test]
 fn test_map_directory_adds_missing_video() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
@@ -308,9 +309,9 @@ fn test_map_directory_adds_missing_video() {
 // So that the real image conversion is tested at least once
 #[test]
 fn test_map_directory_with_image_conversion() {
-    let src_dir = tempfile::tempdir().unwrap();
+    let src_dir = tempdir();
     let src_path = &src_dir.path();
-    let dst_dir = tempfile::tempdir().unwrap();
+    let dst_dir = tempdir();
     let dst_path = &dst_dir.path();
 
     create_src_structure_in_dir(src_path);
@@ -496,4 +497,8 @@ fn get_dir_items(path: &Path) -> Vec<String> {
         .lines()
         .map(|s| s.to_string())
         .collect()
+}
+
+fn tempdir() -> TempDir {
+    tempfile::tempdir().unwrap()
 }

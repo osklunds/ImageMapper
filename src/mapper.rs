@@ -132,7 +132,7 @@ fn handle_source_image(
     let destination_image_path = &destination_path.join(destination_image_name);
 
     if !destination_image_path.exists() {
-        let successful = image::open_compress_and_save_image(
+        let successful = (settings.open_compress_and_save_image)(
             source_image_path,
             destination_image_path,
             &settings.app_settings,

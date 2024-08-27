@@ -452,7 +452,6 @@ fn test_destination_dir_inside_source_dir() {
     assert_eq!(Err(MapperError::DstInsideSrc), result);
 }
 
-// TODO: Test with canon path
 #[test]
 fn test_source_and_destination_dir_are_the_same() {
     let dir = tempdir();

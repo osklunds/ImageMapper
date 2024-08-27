@@ -514,7 +514,7 @@ fn test_destination_dir_has_a_dir_source_dir_empty() {
 }
 
 #[test]
-fn test_source_dir_has_a_dir_destination_dir_does_not() {
+fn test_destination_dir_has_a_file_source_dir_does_not() {
     let src_dir = tempdir();
     let src_path = src_dir.path();
     let dst_dir = tempdir();
@@ -523,8 +523,8 @@ fn test_source_dir_has_a_dir_destination_dir_does_not() {
     create_src_structure_in_dir(src_path);
     map_directory_ok(&src_path, &dst_path, true);
 
-    let dir_only_in_src = src_path.join("some_dir");
-    fs::create_dir(&dir_only_in_src).unwrap();
+    let file_only_in_dst = dst_path.join("some_dir");
+    fs::write(&file_only_in_dst, b"content").unwrap();
 
     let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
 
@@ -532,7 +532,7 @@ fn test_source_dir_has_a_dir_destination_dir_does_not() {
 }
 
 #[test]
-fn test_source_dir_has_a_file_destination_dir_does_not() {
+fn test_destination_dir_has_a_dir_source_dir_does_not() {
     let src_dir = tempdir();
     let src_path = src_dir.path();
     let dst_dir = tempdir();
@@ -541,8 +541,8 @@ fn test_source_dir_has_a_file_destination_dir_does_not() {
     create_src_structure_in_dir(src_path);
     map_directory_ok(&src_path, &dst_path, true);
 
-    let src_file_path = src_path.join("image.jpg");
-    fs::write(&src_file_path, b"content").unwrap();
+    let dir_only_in_dst = dst_path.join("some_dir");
+    fs::create_dir(&dir_only_in_dst).unwrap();
 
     let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
 

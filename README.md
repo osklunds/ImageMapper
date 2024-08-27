@@ -38,7 +38,7 @@ Currently when something goes wrong, `ImageMapper` will exit and print what happ
 
 ## Compatibility
 
-Platforms: Windows, Mac and Linux.
+Platforms: Linux, Mac (most likely), Windows (maybe, but not the tests).
 
 Images: jpg and png.
 

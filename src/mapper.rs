@@ -89,7 +89,7 @@ fn all_top_level_items_in_destination_exist_in_source(
             file_names::destination_image_name_to_source_image_name(
                 file_name,
             );
-        if file_name.is_some() && source_path.join(file_name.unwrap()).exists() {
+        if file_name.is_some() && source_path.join(file_name.as_ref().unwrap()).exists() {
             continue;
         }
 

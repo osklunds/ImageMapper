@@ -100,7 +100,8 @@ pub fn destination_image_name_to_source_image_name(
             file_name
         );
         return Some(trimmed.to_string());
-    } else if length >= 4 {
+        // TODO: Add test case
+    } else if length >= 4 && file_name.get(length-4..length) == Some(".jpg") {
         let trimmed = unwrap!(
             file_name.get(0..length - 4),
             "Could not trim the str: {}",

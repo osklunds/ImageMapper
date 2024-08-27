@@ -107,7 +107,8 @@ fn test_map_directory_removes_unwanted_src_file() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    // TODO: How does it pass?
+    // Note that the file is removed even if it exists at top level,
+    // since it also exists in source, but is of an unwatned type
     map_directory_ok(src_path, dst_path, true);
     File::create(dst_path.join("text_file.txt")).unwrap();
     map_directory_ok(src_path, dst_path, true);
@@ -139,7 +140,7 @@ fn test_map_directory_removes_non_existant_src_dir() {
     create_src_structure_in_dir(src_path);
 
     map_directory_ok(src_path, dst_path, true);
-    fs::create_dir(dst_path.join("dir4")).unwrap();
+    fs::create_dir(dst_path.join("dir1").join("dir4")).unwrap();
     map_directory_ok(src_path, dst_path, true);
 
     check_that_dst_structure_is_correct(dst_path, true);
@@ -451,6 +452,7 @@ fn test_destination_dir_inside_source_dir() {
     assert_eq!(Err(MapperError::DstInsideSrc), result);
 }
 
+// TODO: Test with canon path
 #[test]
 fn test_source_and_destination_dir_are_the_same() {
     let dir = tempdir();
@@ -662,7 +664,7 @@ fn assert_dir_items(exp_dir_items: &[&str], path: &Path) {
     let dir_items = get_dir_items(path);
 
     for (exp_line, line) in std::iter::zip(exp_dir_items, &dir_items) {
-        assert_eq!(exp_line, line, "exp {:?}, act {:?}", exp_line, line);
+        assert_eq!(exp_line, line, "exp:\n{:?} act:\n{:?}", exp_dir_items, dir_items);
     }
 
     // Check length for debuggability

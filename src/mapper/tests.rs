@@ -448,6 +448,16 @@ fn test_destination_dir_inside_source_dir() {
 }
 
 #[test]
+fn test_source_and_destination_dir_are_the_same() {
+    let dir = tempdir();
+    let path = &dir.path();
+
+    let result = mapper::map_directory(&path, &path, SETTINGS);
+
+    assert_eq!(Err(MapperError::SrcInsideDst), result);
+}
+
+#[test]
 fn test_source_dir_inside_destination_dir() {
     let root_dir = tempdir();
     let root_path = root_dir.path();

@@ -387,6 +387,23 @@ fn test_source_does_not_exist() {
 }
 
 #[test]
+fn test_source_is_not_a_dir() {
+    let src_dir = tempdir();
+    let mut src_path = src_dir.path().to_path_buf();
+    src_path.push("file");
+    fs::write(&src_path, b"content").unwrap();
+    assert!(src_path.is_file());
+
+    let dst_dir = tempdir();
+    let dst_path = &dst_dir.path();
+    assert!(dst_path.is_dir());
+
+    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
+
+    assert_eq!(Err(MapperError::SrcDoesNotExist), result);
+}
+
+#[test]
 fn test_destination_does_not_exist() {
     let src_dir = tempdir();
     let src_path = &src_dir.path();
@@ -395,6 +412,23 @@ fn test_destination_does_not_exist() {
     let dst_dir = tempdir();
     let mut dst_path = dst_dir.path().to_path_buf();
     dst_path.push("does_not_exist");
+
+    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
+
+    assert_eq!(Err(MapperError::DstDoesNotExist), result);
+}
+
+#[test]
+fn tst_destination_is_not_a_dir() {
+    let src_dir = tempdir();
+    let src_path = &src_dir.path();
+    assert!(src_path.is_dir());
+
+    let dst_dir = tempdir();
+    let mut dst_path = dst_dir.path().to_path_buf();
+    dst_path.push("file");
+    fs::write(&dst_path, b"content").unwrap();
+    assert!(dst_path.is_file());
 
     let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
 

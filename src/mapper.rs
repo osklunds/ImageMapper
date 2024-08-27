@@ -17,22 +17,20 @@ pub fn map_directory(
     destination_path: &Path,
     settings: Settings,
 ) -> Result<(), MapperError> {
-    let settings = MapperSettings {
-        app_settings: settings,
-        open_compress_and_save_image: image::open_compress_and_save_image,
-    };
-
-    map_directory_with_mapper_settings(
+    map_directory_custom_opts(
         source_path,
         destination_path,
-        &settings
+        settings,
+        image::open_compress_and_save_image,
     )
 }
 
-fn map_directory_with_mapper_settings(
+// Custom options for test purposes
+fn map_directory_custom_opts(
     source_path: &Path,
     destination_path: &Path,
-    settings: &MapperSettings,
+    settings: Settings,
+    open_compress_and_save_image: fn(&Path, &Path, &Settings) -> bool,
 ) -> Result<(), MapperError> {
     if !source_path.is_dir() {
         return Err(MapperError::SrcDoesNotExist);
@@ -47,7 +45,12 @@ fn map_directory_with_mapper_settings(
         return Err(MapperError::DstInsideSrc);
     }
 
-    map_directory_int(source_path, destination_path, &settings);
+    let opts = MapperOptions {
+        settings,
+        open_compress_and_save_image,
+    };
+
+    map_directory_int(source_path, destination_path, &opts);
 
     Ok(())
 }
@@ -61,9 +64,9 @@ fn is_path_subdir_of(path_to_check: &Path, path_to_compare: &Path) -> bool {
 fn map_directory_int(
     source_path: &Path,
     destination_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
-    if settings.app_settings.verbose_print {
+    if opts.settings.verbose_print {
         println!(
             "Entered source: \"{}\" and destination: \"{}\"",
             source_path.display(),
@@ -73,8 +76,8 @@ fn map_directory_int(
 
     ensure_path_is_directory(destination_path);
 
-    iterate_source_entries(source_path, destination_path, settings);
-    iterate_destination_entries(source_path, destination_path, settings);
+    iterate_source_entries(source_path, destination_path, opts);
+    iterate_destination_entries(source_path, destination_path, opts);
 }
 
 fn ensure_path_is_directory(destination_path: &Path) {
@@ -97,7 +100,7 @@ fn ensure_path_is_directory(destination_path: &Path) {
 fn iterate_source_entries(
     source_path: &Path,
     destination_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     let source_entries = open_dir_to_iterator(source_path);
 
@@ -108,9 +111,9 @@ fn iterate_source_entries(
         let source_entry_path = &source_entry.path();
 
         if source_entry_path.is_dir() {
-            handle_source_dir(source_entry_path, destination_path, settings);
+            handle_source_dir(source_entry_path, destination_path, opts);
         } else {
-            handle_source_file(source_entry_path, destination_path, settings);
+            handle_source_file(source_entry_path, destination_path, opts);
         }
     }
 }
@@ -126,7 +129,7 @@ fn open_dir_to_iterator(path: &Path) -> ReadDir {
 fn handle_source_dir(
     source_dir_path: &Path,
     destination_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     let source_dir_name = unwrap!(
         source_dir_path.file_name(),
@@ -135,21 +138,21 @@ fn handle_source_dir(
     );
     let destination_dir_path = &destination_path.join(source_dir_name);
 
-    map_directory_int(source_dir_path, destination_dir_path, settings);
+    map_directory_int(source_dir_path, destination_dir_path, opts);
 }
 
 fn handle_source_file(
     source_file_path: &Path,
     destination_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     if let Some(extension) = source_file_path.extension() {
         if file_names::extension_is_image_extension(extension) {
-            handle_source_image(source_file_path, destination_path, settings);
+            handle_source_image(source_file_path, destination_path, opts);
         } else if file_names::extension_is_video_extension(extension)
-            && settings.app_settings.include_videos
+            && opts.settings.include_videos
         {
-            handle_source_video(source_file_path, destination_path, settings);
+            handle_source_video(source_file_path, destination_path, opts);
         }
     }
     // Some files dont have extensions, so if one is missing, its
@@ -159,23 +162,23 @@ fn handle_source_file(
 fn handle_source_image(
     source_image_path: &Path,
     destination_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     let destination_image_name =
         file_names::destination_image_name_from_image_path(source_image_path);
     let destination_image_path = &destination_path.join(destination_image_name);
 
     if !destination_image_path.exists() {
-        let successful = (settings.open_compress_and_save_image)(
+        let successful = (opts.open_compress_and_save_image)(
             source_image_path,
             destination_image_path,
-            &settings.app_settings,
+            &opts.settings,
         );
 
-        if settings.app_settings.verbose_print && successful {
+        if opts.settings.verbose_print && successful {
             println!("Created image \"{}\"", destination_image_path.display());
         }
-    } else if settings.app_settings.verbose_print {
+    } else if opts.settings.verbose_print {
         println!(
             "Image \"{}\" aleady exists",
             destination_image_path.display()
@@ -186,7 +189,7 @@ fn handle_source_image(
 fn handle_source_video(
     source_video_path: &Path,
     destination_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     let destination_video_name = unwrap!(
         source_video_path.file_name(),
@@ -203,10 +206,10 @@ fn handle_source_video(
             destination_video_path.display()
         );
 
-        if settings.app_settings.verbose_print {
+        if opts.settings.verbose_print {
             println!("Created video \"{}\"", destination_video_path.display());
         }
-    } else if settings.app_settings.verbose_print {
+    } else if opts.settings.verbose_print {
         println!(
             "Video \"{}\" aleady exists",
             destination_video_path.display()
@@ -217,7 +220,7 @@ fn handle_source_video(
 fn iterate_destination_entries(
     source_path: &Path,
     destination_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     let destination_entries = open_dir_to_iterator(destination_path);
 
@@ -231,13 +234,13 @@ fn iterate_destination_entries(
             handle_destination_dir(
                 destination_entry_path,
                 source_path,
-                settings,
+                opts,
             );
         } else {
             handle_destination_file(
                 destination_entry_path,
                 source_path,
-                settings,
+                opts,
             );
         }
     }
@@ -246,7 +249,7 @@ fn iterate_destination_entries(
 fn handle_destination_dir(
     destination_dir_path: &Path,
     source_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     let destination_dir_name = unwrap!(
         destination_dir_path.file_name(),
@@ -263,7 +266,7 @@ fn handle_destination_dir(
             destination_dir_path.display()
         );
 
-        if settings.app_settings.verbose_print {
+        if opts.settings.verbose_print {
             println!("Deleted \"{}\"", destination_dir_path.display());
         }
     }
@@ -275,33 +278,33 @@ fn handle_destination_dir(
 fn handle_destination_file(
     destination_file_path: &Path,
     source_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     if let Some(extension) = destination_file_path.extension() {
         if file_names::extension_is_destination_image_extension(extension) {
             handle_destination_image(
                 destination_file_path,
                 source_path,
-                settings,
+                opts,
             );
         } else if file_names::extension_is_video_extension(extension) {
             handle_destination_video(
                 destination_file_path,
                 source_path,
-                settings,
+                opts,
             );
         } else {
-            handle_destination_other_file(destination_file_path, settings);
+            handle_destination_other_file(destination_file_path, opts);
         }
     } else {
-        handle_destination_extensionless_file(destination_file_path, settings);
+        handle_destination_extensionless_file(destination_file_path, opts);
     }
 }
 
 fn handle_destination_image(
     destination_image_path: &Path,
     source_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     let destination_image_name = destination_image_path
         .file_name()
@@ -331,7 +334,7 @@ fn handle_destination_image(
         deleted = true;
     }
 
-    if settings.app_settings.verbose_print && deleted {
+    if opts.settings.verbose_print && deleted {
         println!("Deleted {}", destination_image_path.display());
     }
 }
@@ -339,7 +342,7 @@ fn handle_destination_image(
 fn handle_destination_video(
     destination_video_path: &Path,
     source_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     let destination_video_name = unwrap!(
         destination_video_path.file_name(),
@@ -353,7 +356,7 @@ fn handle_destination_video(
     // it doesnt exist or is a dir.
     // We must also want to have videos in the destination.
     if !(corresponding_source_entry_path.is_file()
-        && settings.app_settings.include_videos)
+        && opts.settings.include_videos)
     {
         unwrap!(
             fs::remove_file(destination_video_path),
@@ -361,7 +364,7 @@ fn handle_destination_video(
             destination_video_path.display()
         );
 
-        if settings.app_settings.verbose_print {
+        if opts.settings.verbose_print {
             println!("Deleted \"{}\"", destination_video_path.display());
         }
     }
@@ -369,34 +372,34 @@ fn handle_destination_video(
 
 fn handle_destination_other_file(
     destination_file_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     unwrap!(
         fs::remove_file(destination_file_path),
         "Could not delete \"{}\"",
         destination_file_path.display()
     );
-    if settings.app_settings.verbose_print {
+    if opts.settings.verbose_print {
         println!("Deleted \"{}\"", destination_file_path.display());
     }
 }
 
 fn handle_destination_extensionless_file(
     destination_file_path: &Path,
-    settings: &MapperSettings,
+    opts: &MapperOptions,
 ) {
     unwrap!(
         fs::remove_file(destination_file_path),
         "Could not delete \"{}\"",
         destination_file_path.display()
     );
-    if settings.app_settings.verbose_print {
+    if opts.settings.verbose_print {
         println!("Deleted \"{}\"", destination_file_path.display());
     }
 }
 
-struct MapperSettings {
-    app_settings: Settings,
+struct MapperOptions {
+    settings: Settings,
     open_compress_and_save_image: fn(&Path, &Path, &Settings) -> bool,
 }
 

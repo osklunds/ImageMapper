@@ -529,7 +529,7 @@ fn test_destination_dir_has_a_file_source_dir_does_not() {
     create_src_structure_in_dir(src_path);
     map_directory_ok(&src_path, &dst_path, true);
 
-    let file_only_in_dst = dst_path.join("some_dir");
+    let file_only_in_dst = dst_path.join("some_file");
     fs::write(&file_only_in_dst, b"content").unwrap();
 
     assert_eq!(
@@ -553,6 +553,27 @@ fn test_destination_dir_has_a_dir_source_dir_does_not() {
 
     assert_eq!(
         Err(MapperError::DstTopLevelEntryNotInSrc(dir_only_in_dst.clone())),
+        mapper::map_directory(&src_path, &dst_path, SETTINGS),
+    );
+}
+
+#[test]
+fn test_destination_dir_has_multiple_entries_source_dir_does_not() {
+    let src_dir = tempdir();
+    let src_path = src_dir.path();
+    let dst_dir = tempdir();
+    let dst_path = dst_dir.path();
+
+    create_src_structure_in_dir(src_path);
+    map_directory_ok(&src_path, &dst_path, true);
+
+    let file_only_in_dst1 = dst_path.join("file1");
+    fs::write(&file_only_in_dst1, b"content").unwrap();
+    let file_only_in_dst2 = dst_path.join("file2");
+    fs::write(&file_only_in_dst2, b"content").unwrap();
+
+    assert_eq!(
+        Err(MapperError::DstTopLevelEntryNotInSrc(file_only_in_dst1.clone())),
         mapper::map_directory(&src_path, &dst_path, SETTINGS),
     );
 }

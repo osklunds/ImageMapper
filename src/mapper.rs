@@ -22,6 +22,18 @@ pub fn map_directory(
         open_compress_and_save_image: image::open_compress_and_save_image,
     };
 
+    map_directory_with_mapper_settings(
+        source_path,
+        destination_path,
+        &settings
+    )
+}
+
+fn map_directory_with_mapper_settings(
+    source_path: &Path,
+    destination_path: &Path,
+    settings: &MapperSettings,
+) -> Result<(), MapperError> {
     if !source_path.is_dir() {
         return Err(MapperError::SrcDoesNotExist);
     }

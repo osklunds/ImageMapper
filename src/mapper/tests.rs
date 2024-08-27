@@ -52,7 +52,7 @@ fn test_map_directory_correctly_fills_empty_dst_with_videos() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 }
@@ -65,7 +65,7 @@ fn test_map_directory_correctly_fills_empty_dst_without_videos() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS_NO_VIDEO);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS_NO_VIDEO);
 
     check_that_dst_structure_is_correct(dst_path, false);
 }
@@ -81,12 +81,12 @@ fn test_map_directory_dst_already_correct() {
     let src_items_before = get_dir_items(src_path);
     let dst_items_before = get_dir_items(dst_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     let src_items_between = get_dir_items(src_path);
     let dst_items_between = get_dir_items(dst_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 
@@ -108,9 +108,9 @@ fn test_map_directory_removes_unwanted_src_file() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
     File::create(dst_path.join("text_file.txt")).unwrap();
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 }
@@ -123,9 +123,9 @@ fn test_map_directory_removes_non_existant_src_file() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
     File::create(dst_path.join("does not exist.txt")).unwrap();
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 }
@@ -138,9 +138,9 @@ fn test_map_directory_removes_non_existant_src_dir() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
     fs::create_dir(dst_path.join("dir4")).unwrap();
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 }
@@ -153,9 +153,9 @@ fn test_map_directory_removes_non_existant_src_image_double_extension() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
     File::create(dst_path.join("does not exist.jpg.jpg")).unwrap();
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 }
@@ -168,9 +168,9 @@ fn test_map_directory_removes_non_existant_src_image_single_extension() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
     File::create(dst_path.join("does not exist.jpg")).unwrap();
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 }
@@ -183,9 +183,9 @@ fn test_map_directory_removes_non_existant_src_video() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
     File::create(dst_path.join("does not exist.m4v")).unwrap();
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 }
@@ -198,8 +198,8 @@ fn test_map_directory_removes_existant_src_video_if_no_videos_desired() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS_NO_VIDEO);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS_NO_VIDEO);
 
     check_that_dst_structure_is_correct(dst_path, false);
 }
@@ -212,12 +212,12 @@ fn test_map_directory_removes_non_existant_src_image_exif() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
     File::create(
         dst_path.join("   2001-01-01 11;22;33 does not exist.jpg.jpg"),
     )
     .unwrap();
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 }
@@ -230,14 +230,14 @@ fn test_map_directory_does_not_remove_correct_exif_image_in_dst() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     let file_path =
         &dst_path.join("   2010-03-14 11;22;33 small-with-exif.jpg.jpg");
     fs::remove_file(file_path).unwrap();
     fs::write(file_path, "some text").unwrap();
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     let recovered = fs::read_to_string(file_path).unwrap();
     assert_eq!(recovered, "some text");
@@ -251,13 +251,13 @@ fn test_map_directory_does_not_remove_correct_image_in_dst() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     let file_path = &dst_path.join("small-without-exif.jpg.jpg");
     fs::remove_file(file_path).unwrap();
     fs::write(file_path, "some text").unwrap();
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     let recovered = fs::read_to_string(file_path).unwrap();
     assert_eq!(recovered, "some text");
@@ -271,13 +271,13 @@ fn test_map_directory_does_not_remove_correct_video_in_dst() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     let file_path = &dst_path.join("video.m4v");
     fs::remove_file(file_path).unwrap();
     fs::write(file_path, "some text").unwrap();
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     let recovered = fs::read_to_string(file_path).unwrap();
     assert_eq!(recovered, "some text");
@@ -291,13 +291,13 @@ fn test_map_directory_adds_missing_image_exif() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     let file_path =
         &dst_path.join("   2010-03-14 11;22;33 small-with-exif.jpg.jpg");
     fs::remove_file(file_path).unwrap();
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 }
@@ -310,12 +310,12 @@ fn test_map_directory_adds_missing_image() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     let file_path = &dst_path.join("small-without-exif.jpg.jpg");
     fs::remove_file(file_path).unwrap();
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 }
@@ -328,12 +328,12 @@ fn test_map_directory_adds_missing_video() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     let file_path = &dst_path.join("video.m4v");
     fs::remove_file(file_path).unwrap();
 
-    mapper::map_directory_int(src_path, dst_path, &MAPPER_SETTINGS);
+    map_directory_ok(src_path, dst_path, &MAPPER_SETTINGS);
 
     check_that_dst_structure_is_correct(dst_path, true);
 }
@@ -638,4 +638,8 @@ fn get_dir_items(path: &Path) -> Vec<String> {
 
 fn tempdir() -> TempDir {
     tempfile::tempdir().unwrap()
+}
+
+fn map_directory_ok(src_path: &Path, dst_path: &Path, settings: &MapperSettings) {
+    mapper::map_directory_with_mapper_settings(src_path, dst_path, settings).unwrap();
 }

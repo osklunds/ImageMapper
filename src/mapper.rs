@@ -77,11 +77,19 @@ fn all_top_level_items_in_destination_exist_in_source(
         let destination_entry =
             unwrap!(destination_entry, "Could not open a destination entry");
 
-        let corresponding_source_entry_path =
-            source_path.join(destination_entry.file_name());
+        let file_name = destination_entry.file_name();
+        let file_name_try1 = file_name.to_str().expect("Could not convert to str");
+        let file_name_try2 = file_names::destination_image_name_to_source_image_name(file_name_try1);
+
+        // println!("{:?}", file_name_try1);
+        // println!("{:?}", file_name_try2);
 
         // TODO: Change all to try variants
-        if !corresponding_source_entry_path.exists() {
+        if !(source_path.join(file_name_try1).exists() ||
+            (file_name_try2.is_some() && source_path.join(file_name_try2.unwrap()).exists())) {
+                // let src_entries = source_path.read_dir().unwrap().collect::<Vec<_>>();
+                // println!("oskar: {:?}", src_entries);
+                // println!("oskar: {:?}", source_path.join(file_name_try1).exists());
             return false;
         }
     }

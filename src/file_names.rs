@@ -3,9 +3,14 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 use regex::Regex;
+use lazy_static::lazy_static;
 
 use exif::{In, Tag};
 use unwrap::unwrap;
+
+lazy_static! {
+    static ref DST_NAME_RE: Regex = Regex::new(r"(   \d{4}-\d{2}-\d{2} \d{2};\d{2};\d{2} )?(.+)\.jpg").unwrap();
+}
 
 pub fn extension_is_image_extension(extension: &OsStr) -> bool {
     if let Some(extension) = extension.to_str() {
@@ -96,9 +101,7 @@ fn date_time_string_from_image_path(image_path: &Path) -> String {
 pub fn destination_image_name_to_source_image_name(
     file_name: &str,
 ) -> Option<String> {
-    let re = Regex::new(r"(   \d{4}-\d{2}-\d{2} \d{2};\d{2};\d{2} )?(.+)\.jpg").unwrap();
-
-    if let Some(captures) = re.captures(file_name) {
+    if let Some(captures) = DST_NAME_RE.captures(file_name) {
         Some(captures.get(2).unwrap().as_str().to_owned())
     } else {
         None

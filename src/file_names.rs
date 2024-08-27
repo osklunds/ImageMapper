@@ -2,6 +2,7 @@ use std::ffi::OsStr;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
+use regex::Regex;
 
 use exif::{In, Tag};
 use unwrap::unwrap;
@@ -95,24 +96,12 @@ fn date_time_string_from_image_path(image_path: &Path) -> String {
 pub fn destination_image_name_to_source_image_name(
     file_name: &str,
 ) -> Option<String> {
-    let length = file_name.len();
-    if length >= 24 && file_name.get(0..3) == Some("   ") {
-        let trimmed = unwrap!(
-            file_name.get(23..(length - 4)),
-            "Could not trim the str: {}",
-            file_name
-        );
-        return Some(trimmed.to_string());
-        // TODO: Add test case
-    } else if length >= 4 && file_name.get(length-4..length) == Some(".jpg") {
-        let trimmed = unwrap!(
-            file_name.get(0..length - 4),
-            "Could not trim the str: {}",
-            file_name
-        );
-        return Some(trimmed.to_string());
+    let re = Regex::new(r"(   \d{4}-\d{2}-\d{2} \d{2};\d{2};\d{2} )?(.+)\.jpg").unwrap();
+
+    if let Some(captures) = re.captures(file_name) {
+        Some(captures.get(2).unwrap().as_str().to_owned())
     } else {
-        return None;
+        None
     }
 }
 
@@ -250,8 +239,8 @@ mod tests {
     }
 
     #[test]
-    fn test_destination_image_name_to_source_image_name_too_short() {
-        let destination_image_name = "b";
+    fn test_destination_image_name_to_source_image_name_no_extension() {
+        let destination_image_name = "image";
         let source_image_name =
             destination_image_name_to_source_image_name(destination_image_name);
         assert_eq!(source_image_name, None);

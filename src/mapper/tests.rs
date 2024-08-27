@@ -107,6 +107,7 @@ fn test_map_directory_removes_unwanted_src_file() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
+    // TODO: How does it pass?
     map_directory_ok(src_path, dst_path, true);
     File::create(dst_path.join("text_file.txt")).unwrap();
     map_directory_ok(src_path, dst_path, true);
@@ -123,7 +124,7 @@ fn test_map_directory_removes_non_existant_src_file() {
     create_src_structure_in_dir(src_path);
 
     map_directory_ok(src_path, dst_path, true);
-    File::create(dst_path.join("does not exist.txt")).unwrap();
+    File::create(dst_path.join("dir1").join("does not exist.txt")).unwrap();
     map_directory_ok(src_path, dst_path, true);
 
     check_that_dst_structure_is_correct(dst_path, true);
@@ -153,7 +154,7 @@ fn test_map_directory_removes_non_existant_src_image_double_extension() {
     create_src_structure_in_dir(src_path);
 
     map_directory_ok(src_path, dst_path, true);
-    File::create(dst_path.join("does not exist.jpg.jpg")).unwrap();
+    File::create(dst_path.join("dir1").join("does not exist.jpg.jpg")).unwrap();
     map_directory_ok(src_path, dst_path, true);
 
     check_that_dst_structure_is_correct(dst_path, true);
@@ -168,7 +169,7 @@ fn test_map_directory_removes_non_existant_src_image_single_extension() {
     create_src_structure_in_dir(src_path);
 
     map_directory_ok(src_path, dst_path, true);
-    File::create(dst_path.join("does not exist.jpg")).unwrap();
+    File::create(dst_path.join("dir1").join("does not exist.jpg")).unwrap();
     map_directory_ok(src_path, dst_path, true);
 
     check_that_dst_structure_is_correct(dst_path, true);
@@ -183,7 +184,7 @@ fn test_map_directory_removes_non_existant_src_video() {
     create_src_structure_in_dir(src_path);
 
     map_directory_ok(src_path, dst_path, true);
-    File::create(dst_path.join("does not exist.m4v")).unwrap();
+    File::create(dst_path.join("dir1").join("does not exist.m4v")).unwrap();
     map_directory_ok(src_path, dst_path, true);
 
     check_that_dst_structure_is_correct(dst_path, true);
@@ -213,7 +214,7 @@ fn test_map_directory_removes_non_existant_src_image_exif() {
 
     map_directory_ok(src_path, dst_path, true);
     File::create(
-        dst_path.join("   2001-01-01 11;22;33 does not exist.jpg.jpg"),
+        dst_path.join("dir1").join("   2001-01-01 11;22;33 does not exist.jpg.jpg"),
     )
     .unwrap();
     map_directory_ok(src_path, dst_path, true);

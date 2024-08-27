@@ -134,6 +134,21 @@ fn test_map_directory_removes_non_existant_src_file() {
 }
 
 #[test]
+fn test_map_directory_removes_non_existant_extensionless_src_file() {
+    let src_dir = tempdir();
+    let src_path = &src_dir.path();
+    let dst_dir = tempdir();
+    let dst_path = &dst_dir.path();
+    create_src_structure_in_dir(src_path);
+
+    map_directory_ok(src_path, dst_path, true);
+    File::create(dst_path.join("dir1").join("does not exist")).unwrap();
+    map_directory_ok(src_path, dst_path, true);
+
+    check_that_dst_structure_is_correct(dst_path, true);
+}
+
+#[test]
 fn test_map_directory_removes_non_existant_src_dir() {
     let src_dir = tempdir();
     let src_path = &src_dir.path();

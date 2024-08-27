@@ -321,8 +321,7 @@ fn handle_destination_file(
             handle_destination_other_file(destination_file_path, opts);
         }
     } else {
-        // TODO: Add test case for this case
-        handle_destination_extensionless_file(destination_file_path, opts);
+        handle_destination_other_file(destination_file_path, opts);
     }
 }
 
@@ -396,20 +395,6 @@ fn handle_destination_video(
 }
 
 fn handle_destination_other_file(
-    destination_file_path: &Path,
-    opts: &MapperOptions,
-) {
-    unwrap!(
-        fs::remove_file(destination_file_path),
-        "Could not delete \"{}\"",
-        destination_file_path.display()
-    );
-    if opts.settings.verbose_print {
-        println!("Deleted \"{}\"", destination_file_path.display());
-    }
-}
-
-fn handle_destination_extensionless_file(
     destination_file_path: &Path,
     opts: &MapperOptions,
 ) {

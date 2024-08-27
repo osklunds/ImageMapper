@@ -32,7 +32,7 @@ fn main() {
         Err(MapperError::DstInsideSrc) => {
             println!("{:?}", "hej");
         }
-        Err(MapperError::DstTopLevelItemNotInSrc) => {
+        Err(MapperError::DstTopLevelEntryNotInSrc) => {
             println!("{:?}", "hej");
         }
     }

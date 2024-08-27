@@ -77,26 +77,26 @@ fn test_map_directory_dst_already_correct() {
     let dst_path = &dst_dir.path();
     create_src_structure_in_dir(src_path);
 
-    let src_items_before = get_dir_items(src_path);
-    let dst_items_before = get_dir_items(dst_path);
+    let src_entries_before = get_dir_entries(src_path);
+    let dst_entries_before = get_dir_entries(dst_path);
 
     map_directory_ok(src_path, dst_path, true);
 
-    let src_items_between = get_dir_items(src_path);
-    let dst_items_between = get_dir_items(dst_path);
+    let src_entries_between = get_dir_entries(src_path);
+    let dst_entries_between = get_dir_entries(dst_path);
 
     map_directory_ok(src_path, dst_path, true);
 
     check_that_dst_structure_is_correct(dst_path, true);
 
-    let src_items_after = get_dir_items(src_path);
-    let dst_items_after = get_dir_items(dst_path);
+    let src_entries_after = get_dir_entries(src_path);
+    let dst_entries_after = get_dir_entries(dst_path);
 
-    assert_eq!(src_items_before, src_items_between);
-    assert_eq!(src_items_between, src_items_after);
+    assert_eq!(src_entries_before, src_entries_between);
+    assert_eq!(src_entries_between, src_entries_after);
 
-    assert_ne!(dst_items_before, dst_items_between);
-    assert_eq!(dst_items_between, dst_items_after);
+    assert_ne!(dst_entries_before, dst_entries_between);
+    assert_eq!(dst_entries_between, dst_entries_after);
 }
 
 #[test]
@@ -357,8 +357,8 @@ fn test_map_directory_with_image_conversion() {
         let image_path = src_path.join("small-with-exif.jpg");
         fs::copy("test_resources/small-with-exif.jpg", image_path).unwrap();
 
-        let exp_src_items = vec!["small-with-exif.jpg"];
-        assert_dir_items(&exp_src_items, src_path);
+        let exp_src_entries = vec!["small-with-exif.jpg"];
+        assert_dir_entries(&exp_src_entries, src_path);
 
         let settings = Settings {
             image_quality,
@@ -371,9 +371,9 @@ fn test_map_directory_with_image_conversion() {
         // TODO: Check if they are actually images, so that conversion
         // didn't crash
         // Could have a print fun as opt
-        let exp_dst_items =
+        let exp_dst_entries =
             vec!["   2010-03-14 11;22;33 small-with-exif.jpg.jpg"];
-        assert_dir_items(&exp_dst_items, dst_path);
+        assert_dir_entries(&exp_dst_entries, dst_path);
     }
 }
 
@@ -496,7 +496,7 @@ fn test_destination_dir_has_a_file_source_dir_empty() {
 
     let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
 
-    assert_eq!(Err(MapperError::DstTopLevelItemNotInSrc), result);
+    assert_eq!(Err(MapperError::DstTopLevelEntryNotInSrc), result);
 }
 
 #[test]
@@ -514,7 +514,7 @@ fn test_destination_dir_has_a_dir_source_dir_empty() {
 
     let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
 
-    assert_eq!(Err(MapperError::DstTopLevelItemNotInSrc), result);
+    assert_eq!(Err(MapperError::DstTopLevelEntryNotInSrc), result);
 }
 
 #[test]
@@ -532,7 +532,7 @@ fn test_destination_dir_has_a_file_source_dir_does_not() {
 
     let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
 
-    assert_eq!(Err(MapperError::DstTopLevelItemNotInSrc), result);
+    assert_eq!(Err(MapperError::DstTopLevelEntryNotInSrc), result);
 }
 
 #[test]
@@ -550,7 +550,7 @@ fn test_destination_dir_has_a_dir_source_dir_does_not() {
 
     let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
 
-    assert_eq!(Err(MapperError::DstTopLevelItemNotInSrc), result);
+    assert_eq!(Err(MapperError::DstTopLevelEntryNotInSrc), result);
 }
 
 // -----------------------------------------------------------------------------
@@ -587,7 +587,7 @@ fn create_src_structure_in_dir(path: &Path) {
     let movie_path = path.join("video.m4v");
     File::create(movie_path).unwrap();
 
-    let exp_dir_items = vec![
+    let exp_dir_entries = vec![
         "dir1",
         "dir1/small-with-exif.jpg",
         "dir2",
@@ -603,7 +603,7 @@ fn create_src_structure_in_dir(path: &Path) {
         "video.m4v",
         "word.docx",
     ];
-    assert_dir_items(&exp_dir_items, path);
+    assert_dir_entries(&exp_dir_entries, path);
 }
 
 fn create_dir1_in_dir(dir_path: &Path) {
@@ -643,7 +643,7 @@ fn create_subdir2_in_dir(dir_path: &Path) {
 }
 
 fn check_that_dst_structure_is_correct(dst_path: &Path, videos: bool) {
-    let mut exp_dir_items = vec![
+    let mut exp_dir_entries = vec![
         "   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
         "dir1",
         "dir1/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
@@ -658,31 +658,31 @@ fn check_that_dst_structure_is_correct(dst_path: &Path, videos: bool) {
     ];
 
     if videos {
-        exp_dir_items.push("video.m4v");
+        exp_dir_entries.push("video.m4v");
     }
 
-    assert_dir_items(&exp_dir_items, dst_path);
+    assert_dir_entries(&exp_dir_entries, dst_path);
 }
 
-fn assert_dir_items(exp_dir_items: &[&str], path: &Path) {
-    let dir_items = get_dir_items(path);
+fn assert_dir_entries(exp_dir_entries: &[&str], path: &Path) {
+    let dir_entries = get_dir_entries(path);
 
-    for (exp_line, line) in std::iter::zip(exp_dir_items, &dir_items) {
+    for (exp_line, line) in std::iter::zip(exp_dir_entries, &dir_entries) {
         assert_eq!(
             exp_line, line,
             "exp:\n{:?} act:\n{:?}",
-            exp_dir_items, dir_items
+            exp_dir_entries, dir_entries
         );
     }
 
     // Check length for debuggability
-    assert_eq!(exp_dir_items.len(), dir_items.len());
+    assert_eq!(exp_dir_entries.len(), dir_entries.len());
 
     // Then check all as an extra check if the above checks are buggy
-    assert_eq!(exp_dir_items, dir_items);
+    assert_eq!(exp_dir_entries, dir_entries);
 }
 
-fn get_dir_items(path: &Path) -> Vec<String> {
+fn get_dir_entries(path: &Path) -> Vec<String> {
     let result = Command::new("bash")
         .arg("-c")
         .arg("find *")

@@ -44,11 +44,11 @@ fn map_directory_custom_opts(
     if is_path_subdir_of(&destination_path, &source_path) {
         return Err(MapperError::DstInsideSrc);
     }
-    if !all_top_level_items_in_destination_exist_in_source(
+    if !all_top_level_entries_in_destination_exist_in_source(
         &source_path,
         &destination_path,
     ) {
-        return Err(MapperError::DstTopLevelItemNotInSrc);
+        return Err(MapperError::DstTopLevelEntryNotInSrc);
     }
 
     let opts = MapperOptions {
@@ -67,7 +67,7 @@ fn is_path_subdir_of(path_to_check: &Path, path_to_compare: &Path) -> bool {
     path_to_check.starts_with(&path_to_compare)
 }
 
-fn all_top_level_items_in_destination_exist_in_source(
+fn all_top_level_entries_in_destination_exist_in_source(
     source_path: &Path,
     destination_path: &Path,
 ) -> bool {
@@ -433,5 +433,5 @@ pub enum MapperError {
     DstDoesNotExist,
     SrcInsideDst,
     DstInsideSrc,
-    DstTopLevelItemNotInSrc,
+    DstTopLevelEntryNotInSrc,
 }

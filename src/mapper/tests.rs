@@ -494,9 +494,10 @@ fn test_destination_dir_has_a_file_source_dir_empty() {
     let src_entries = src_path.read_dir().unwrap().collect::<Vec<_>>();
     assert!(src_entries.is_empty());
 
-    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
-
-    assert_eq!(Err(MapperError::DstTopLevelEntryNotInSrc), result);
+    assert_eq!(
+        Err(MapperError::DstTopLevelEntryNotInSrc(dst_file_path.clone())),
+        mapper::map_directory(&src_path, &dst_path, SETTINGS),
+    );
 }
 
 #[test]
@@ -512,9 +513,10 @@ fn test_destination_dir_has_a_dir_source_dir_empty() {
     let src_entries = src_path.read_dir().unwrap().collect::<Vec<_>>();
     assert!(src_entries.is_empty());
 
-    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
-
-    assert_eq!(Err(MapperError::DstTopLevelEntryNotInSrc), result);
+    assert_eq!(
+        Err(MapperError::DstTopLevelEntryNotInSrc(dir_in_dst_path.clone())),
+        mapper::map_directory(&src_path, &dst_path, SETTINGS),
+    );
 }
 
 #[test]
@@ -530,9 +532,10 @@ fn test_destination_dir_has_a_file_source_dir_does_not() {
     let file_only_in_dst = dst_path.join("some_dir");
     fs::write(&file_only_in_dst, b"content").unwrap();
 
-    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
-
-    assert_eq!(Err(MapperError::DstTopLevelEntryNotInSrc), result);
+    assert_eq!(
+        Err(MapperError::DstTopLevelEntryNotInSrc(file_only_in_dst.clone())),
+        mapper::map_directory(&src_path, &dst_path, SETTINGS),
+    );
 }
 
 #[test]
@@ -548,9 +551,10 @@ fn test_destination_dir_has_a_dir_source_dir_does_not() {
     let dir_only_in_dst = dst_path.join("some_dir");
     fs::create_dir(&dir_only_in_dst).unwrap();
 
-    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
-
-    assert_eq!(Err(MapperError::DstTopLevelEntryNotInSrc), result);
+    assert_eq!(
+        Err(MapperError::DstTopLevelEntryNotInSrc(dir_only_in_dst.clone())),
+        mapper::map_directory(&src_path, &dst_path, SETTINGS),
+    );
 }
 
 // -----------------------------------------------------------------------------

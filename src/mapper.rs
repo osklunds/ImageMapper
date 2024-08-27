@@ -1,6 +1,6 @@
 use std::fs;
 use std::fs::ReadDir;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::result::Result;
 
 use unwrap::unwrap;
@@ -44,11 +44,11 @@ fn map_directory_custom_opts(
     if is_path_subdir_of(&destination_path, &source_path) {
         return Err(MapperError::DstInsideSrc);
     }
-    if !all_top_level_entries_in_destination_exist_in_source(
+    if let Some(missing_entry) = top_level_entry_in_destination_missing_from_source(
         &source_path,
         &destination_path,
     ) {
-        return Err(MapperError::DstTopLevelEntryNotInSrc);
+        return Err(MapperError::DstTopLevelEntryNotInSrc(missing_entry));
     }
 
     let opts = MapperOptions {
@@ -67,10 +67,10 @@ fn is_path_subdir_of(path_to_check: &Path, path_to_compare: &Path) -> bool {
     path_to_check.starts_with(&path_to_compare)
 }
 
-fn all_top_level_entries_in_destination_exist_in_source(
+fn top_level_entry_in_destination_missing_from_source(
     source_path: &Path,
     destination_path: &Path,
-) -> bool {
+) -> Option<PathBuf> {
     let destination_entries = open_dir_to_iterator(destination_path);
 
     for destination_entry in destination_entries {
@@ -93,11 +93,10 @@ fn all_top_level_entries_in_destination_exist_in_source(
             continue;
         }
 
-        // TODO: Include which file is missing
-        return false;
+        return Some(destination_entry.path());
     }
 
-    true
+    None
 }
 
 fn map_directory_int(
@@ -433,5 +432,5 @@ pub enum MapperError {
     DstDoesNotExist,
     SrcInsideDst,
     DstInsideSrc,
-    DstTopLevelEntryNotInSrc,
+    DstTopLevelEntryNotInSrc(PathBuf),
 }

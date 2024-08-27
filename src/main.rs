@@ -32,7 +32,7 @@ fn main() {
         Err(MapperError::DstInsideSrc) => {
             println!("{:?}", "hej");
         }
-        Err(MapperError::DstTopLevelEntryNotInSrc) => {
+        Err(MapperError::DstTopLevelEntryNotInSrc(_missing_path)) => {
             println!("{:?}", "hej");
         }
     }

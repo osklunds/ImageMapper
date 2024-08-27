@@ -44,6 +44,12 @@ fn map_directory_custom_opts(
     if is_path_subdir_of(&destination_path, &source_path) {
         return Err(MapperError::DstInsideSrc);
     }
+    if !all_top_level_items_in_destination_exist_in_source(
+        &source_path,
+        &destination_path,
+    ) {
+        return Err(MapperError::DstTopLevelItemNotInSrc);
+    }
 
     let opts = MapperOptions {
         settings,
@@ -59,6 +65,28 @@ fn is_path_subdir_of(path_to_check: &Path, path_to_compare: &Path) -> bool {
     let path_to_check = fs::canonicalize(path_to_check).unwrap();
     let path_to_compare = fs::canonicalize(path_to_compare).unwrap();
     path_to_check.starts_with(&path_to_compare)
+}
+
+fn all_top_level_items_in_destination_exist_in_source(
+    source_path: &Path,
+    destination_path: &Path,
+) -> bool {
+    let destination_entries = open_dir_to_iterator(destination_path);
+
+    for destination_entry in destination_entries {
+        let destination_entry =
+            unwrap!(destination_entry, "Could not open a destination entry");
+
+        let corresponding_source_entry_path =
+            source_path.join(destination_entry.file_name());
+
+        // TODO: Change all to try variants
+        if !corresponding_source_entry_path.exists() {
+            return false;
+        }
+    }
+
+    true
 }
 
 fn map_directory_int(
@@ -409,5 +437,5 @@ pub enum MapperError {
     DstDoesNotExist,
     SrcInsideDst,
     DstInsideSrc,
-    // DstTopLevelDirNotInSrc,
+    DstTopLevelItemNotInSrc,
 }

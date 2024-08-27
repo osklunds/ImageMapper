@@ -364,6 +364,9 @@ fn test_map_directory_with_image_conversion() {
 
         mapper::map_directory(src_path, dst_path, settings).unwrap();
 
+        // TODO: Check if they are actually images, so that conversion
+        // didn't crash
+        // Could have a print fun as opt
         let exp_dst_items =
             vec!["   2010-03-14 11;22;33 small-with-exif.jpg.jpg"];
         assert_dir_items(&exp_dst_items, dst_path);
@@ -472,6 +475,78 @@ fn test_source_dir_inside_destination_dir() {
     let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
 
     assert_eq!(Err(MapperError::SrcInsideDst), result);
+}
+
+#[test]
+fn test_destination_dir_has_a_file_source_dir_empty() {
+    let src_dir = tempdir();
+    let src_path = src_dir.path();
+    let dst_dir = tempdir();
+    let dst_path = dst_dir.path();
+
+    let dst_file_path = dst_path.join("image.jpg");
+    fs::write(&dst_file_path, b"content").unwrap();
+
+    let src_entries = src_path.read_dir().unwrap().collect::<Vec<_>>();
+    assert!(src_entries.is_empty());
+
+    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
+
+    assert_eq!(Err(MapperError::DstTopLevelItemNotInSrc), result);
+}
+
+#[test]
+fn test_destination_dir_has_a_dir_source_dir_empty() {
+    let src_dir = tempdir();
+    let src_path = src_dir.path();
+    let dst_dir = tempdir();
+    let dst_path = dst_dir.path();
+
+    let dir_in_dst_path = dst_path.join("some_dir");
+    fs::create_dir(&dir_in_dst_path).unwrap();
+
+    let src_entries = src_path.read_dir().unwrap().collect::<Vec<_>>();
+    assert!(src_entries.is_empty());
+
+    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
+
+    assert_eq!(Err(MapperError::DstTopLevelItemNotInSrc), result);
+}
+
+#[test]
+fn test_source_dir_has_a_dir_destination_dir_does_not() {
+    let src_dir = tempdir();
+    let src_path = src_dir.path();
+    let dst_dir = tempdir();
+    let dst_path = dst_dir.path();
+
+    create_src_structure_in_dir(src_path);
+    map_directory_ok(&src_path, &dst_path, true);
+
+    let dir_only_in_src = src_path.join("some_dir");
+    fs::create_dir(&dir_only_in_src).unwrap();
+
+    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
+
+    assert_eq!(Err(MapperError::DstTopLevelItemNotInSrc), result);
+}
+
+#[test]
+fn test_source_dir_has_a_file_destination_dir_does_not() {
+    let src_dir = tempdir();
+    let src_path = src_dir.path();
+    let dst_dir = tempdir();
+    let dst_path = dst_dir.path();
+
+    create_src_structure_in_dir(src_path);
+    map_directory_ok(&src_path, &dst_path, true);
+
+    let src_file_path = src_path.join("image.jpg");
+    fs::write(&src_file_path, b"content").unwrap();
+
+    let result = mapper::map_directory(&src_path, &dst_path, SETTINGS);
+
+    assert_eq!(Err(MapperError::DstTopLevelItemNotInSrc), result);
 }
 
 // -----------------------------------------------------------------------------

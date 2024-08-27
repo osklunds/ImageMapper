@@ -31,5 +31,9 @@ fn main() {
         Err(MapperError::DstInsideSrc) => {
             println!("{:?}", "hej");
         }
+        Err(MapperError::DstTopLevelItemNotInSrc) => {
+            println!("{:?}", "hej");
+        }
+
     }
 }

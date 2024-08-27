@@ -113,6 +113,8 @@ fn test_map_directory_removes_unwanted_src_file() {
     File::create(dst_path.join("text_file.txt")).unwrap();
     map_directory_ok(src_path, dst_path, true);
 
+    // TODO: For these types of tests, would be nice to check
+    // calls to fs:: or at least that dst structure is incorrect before
     check_that_dst_structure_is_correct(dst_path, true);
 }
 

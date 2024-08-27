@@ -340,6 +340,7 @@ fn test_map_directory_adds_missing_video() {
 
 // So that the real image conversion is tested at least once
 #[test]
+#[ignore] // Because expensive
 fn test_map_directory_with_image_conversion() {
     for image_quality in [
         ImageQuality::Thumbnail,

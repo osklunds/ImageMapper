@@ -514,7 +514,9 @@ fn test_destination_dir_has_a_dir_source_dir_empty() {
     assert!(src_entries.is_empty());
 
     assert_eq!(
-        Err(MapperError::DstTopLevelEntryNotInSrc(dir_in_dst_path.clone())),
+        Err(MapperError::DstTopLevelEntryNotInSrc(
+            dir_in_dst_path.clone()
+        )),
         mapper::map_directory(&src_path, &dst_path, SETTINGS),
     );
 }
@@ -533,7 +535,9 @@ fn test_destination_dir_has_a_file_source_dir_does_not() {
     fs::write(&file_only_in_dst, b"content").unwrap();
 
     assert_eq!(
-        Err(MapperError::DstTopLevelEntryNotInSrc(file_only_in_dst.clone())),
+        Err(MapperError::DstTopLevelEntryNotInSrc(
+            file_only_in_dst.clone()
+        )),
         mapper::map_directory(&src_path, &dst_path, SETTINGS),
     );
 }
@@ -552,7 +556,9 @@ fn test_destination_dir_has_a_dir_source_dir_does_not() {
     fs::create_dir(&dir_only_in_dst).unwrap();
 
     assert_eq!(
-        Err(MapperError::DstTopLevelEntryNotInSrc(dir_only_in_dst.clone())),
+        Err(MapperError::DstTopLevelEntryNotInSrc(
+            dir_only_in_dst.clone()
+        )),
         mapper::map_directory(&src_path, &dst_path, SETTINGS),
     );
 }
@@ -573,7 +579,9 @@ fn test_destination_dir_has_multiple_entries_source_dir_does_not() {
     fs::write(&file_only_in_dst2, b"content").unwrap();
 
     assert_eq!(
-        Err(MapperError::DstTopLevelEntryNotInSrc(file_only_in_dst1.clone())),
+        Err(MapperError::DstTopLevelEntryNotInSrc(
+            file_only_in_dst1.clone()
+        )),
         mapper::map_directory(&src_path, &dst_path, SETTINGS),
     );
 }

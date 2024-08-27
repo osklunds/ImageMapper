@@ -44,10 +44,12 @@ fn map_directory_custom_opts(
     if is_path_subdir_of(&destination_path, &source_path) {
         return Err(MapperError::DstInsideSrc);
     }
-    if let Some(missing_entry) = top_level_entry_in_destination_missing_from_source(
-        &source_path,
-        &destination_path,
-    ) {
+    if let Some(missing_entry) =
+        top_level_entry_in_destination_missing_from_source(
+            &source_path,
+            &destination_path,
+        )
+    {
         return Err(MapperError::DstTopLevelEntryNotInSrc(missing_entry));
     }
 

@@ -86,10 +86,10 @@ fn all_top_level_items_in_destination_exist_in_source(
 
         // Try again assuming the file is a converted image
         let file_name =
-            file_names::destination_image_name_to_source_image_name(
-                file_name,
-            );
-        if file_name.is_some() && source_path.join(file_name.as_ref().unwrap()).exists() {
+            file_names::destination_image_name_to_source_image_name(file_name);
+        if file_name.is_some()
+            && source_path.join(file_name.as_ref().unwrap()).exists()
+        {
             continue;
         }
 

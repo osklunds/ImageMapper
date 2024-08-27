@@ -4,9 +4,9 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use tempfile::TempDir;
 
-use crate::settings::{ImageQuality, Settings};
 use crate::mapper;
 use crate::mapper::MapperError;
+use crate::settings::{ImageQuality, Settings};
 
 #[test]
 fn test_ensure_path_is_directory_removes_file() {
@@ -215,7 +215,9 @@ fn test_map_directory_removes_non_existant_src_image_exif() {
 
     map_directory_ok(src_path, dst_path, true);
     File::create(
-        dst_path.join("dir1").join("   2001-01-01 11;22;33 does not exist.jpg.jpg"),
+        dst_path
+            .join("dir1")
+            .join("   2001-01-01 11;22;33 does not exist.jpg.jpg"),
     )
     .unwrap();
     map_directory_ok(src_path, dst_path, true);
@@ -630,7 +632,10 @@ fn create_dir2_in_dir(dir_path: &Path) {
 
 fn create_subdir1_in_dir(dir_path: &Path) {
     let subdir1_path = create_dir_with_name_in_dir("subdir1", dir_path);
-    create_small_image_with_exif_in_dir(&subdir1_path, "small-with-exifåäöあ!@#$%^&*().jpg");
+    create_small_image_with_exif_in_dir(
+        &subdir1_path,
+        "small-with-exifåäöあ!@#$%^&*().jpg",
+    );
 }
 
 fn create_subdir2_in_dir(dir_path: &Path) {
@@ -663,7 +668,11 @@ fn assert_dir_items(exp_dir_items: &[&str], path: &Path) {
     let dir_items = get_dir_items(path);
 
     for (exp_line, line) in std::iter::zip(exp_dir_items, &dir_items) {
-        assert_eq!(exp_line, line, "exp:\n{:?} act:\n{:?}", exp_dir_items, dir_items);
+        assert_eq!(
+            exp_line, line,
+            "exp:\n{:?} act:\n{:?}",
+            exp_dir_items, dir_items
+        );
     }
 
     // Check length for debuggability
@@ -708,8 +717,9 @@ fn map_directory_ok(src_path: &Path, dst_path: &Path, include_videos: bool) {
         src_path,
         dst_path,
         settings,
-        no_convert_image
-    ).unwrap();
+        no_convert_image,
+    )
+    .unwrap();
 }
 
 pub fn no_convert_image(

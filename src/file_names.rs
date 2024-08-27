@@ -1,15 +1,17 @@
+use lazy_static::lazy_static;
+use regex::Regex;
 use std::ffi::OsStr;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
-use regex::Regex;
-use lazy_static::lazy_static;
 
 use exif::{In, Tag};
 use unwrap::unwrap;
 
 lazy_static! {
-    static ref DST_NAME_RE: Regex = Regex::new(r"(   \d{4}-\d{2}-\d{2} \d{2};\d{2};\d{2} )?(.+)\.jpg").unwrap();
+    static ref DST_NAME_RE: Regex =
+        Regex::new(r"(   \d{4}-\d{2}-\d{2} \d{2};\d{2};\d{2} )?(.+)\.jpg")
+            .unwrap();
 }
 
 pub fn extension_is_image_extension(extension: &OsStr) -> bool {

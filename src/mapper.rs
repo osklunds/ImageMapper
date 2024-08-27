@@ -321,6 +321,7 @@ fn handle_destination_file(
             handle_destination_other_file(destination_file_path, opts);
         }
     } else {
+        // TODO: Add test case for this case
         handle_destination_extensionless_file(destination_file_path, opts);
     }
 }

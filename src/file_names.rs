@@ -89,6 +89,9 @@ fn date_time_string_from_image_path(image_path: &Path) -> String {
     "".to_string()
 }
 
+// This function always converts a correct destination image name to the
+// corresponding source image name. For incorrect destination image names
+// it might return a Some value anyway, e.g. if parts of the date is missing.
 pub fn destination_image_name_to_source_image_name(
     file_name: &str,
 ) -> Option<String> {

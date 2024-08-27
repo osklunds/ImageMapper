@@ -560,7 +560,7 @@ fn create_src_structure_in_dir(path: &Path) {
     create_dir2_in_dir(path);
 
     create_dir_with_name_in_dir("dir3", path);
-    create_small_image_with_exif_in_dir(path);
+    create_small_image_with_exif_in_dir(path, "small-with-exif.jpg");
 
     let small_without_exif_jpg_path = path.join("small-without-exif.jpg");
     fs::copy(
@@ -590,7 +590,7 @@ fn create_src_structure_in_dir(path: &Path) {
         "dir1/small-with-exif.jpg",
         "dir2",
         "dir2/subdir1",
-        "dir2/subdir1/small-with-exif.jpg",
+        "dir2/subdir1/small-with-exifåäöあ!@#$%^&*().jpg",
         "dir2/subdir2",
         "dir2/small-with-exif.jpg",
         "dir3",
@@ -606,7 +606,7 @@ fn create_src_structure_in_dir(path: &Path) {
 
 fn create_dir1_in_dir(dir_path: &Path) {
     let dir1_path = create_dir_with_name_in_dir("dir1", dir_path);
-    create_small_image_with_exif_in_dir(&dir1_path);
+    create_small_image_with_exif_in_dir(&dir1_path, "small-with-exif.jpg");
 }
 
 fn create_dir_with_name_in_dir(name: &str, dir_path: &Path) -> PathBuf {
@@ -615,8 +615,8 @@ fn create_dir_with_name_in_dir(name: &str, dir_path: &Path) -> PathBuf {
     subdir_path
 }
 
-fn create_small_image_with_exif_in_dir(dir_path: &Path) {
-    let image_path = dir_path.join("small-with-exif.jpg");
+fn create_small_image_with_exif_in_dir(dir_path: &Path, image_name: &str) {
+    let image_path = dir_path.join(image_name);
     fs::copy("test_resources/small-with-exif.jpg", image_path).unwrap();
 }
 
@@ -625,12 +625,12 @@ fn create_dir2_in_dir(dir_path: &Path) {
 
     create_subdir1_in_dir(&dir2_path);
     create_subdir2_in_dir(&dir2_path);
-    create_small_image_with_exif_in_dir(&dir2_path);
+    create_small_image_with_exif_in_dir(&dir2_path, "small-with-exif.jpg");
 }
 
 fn create_subdir1_in_dir(dir_path: &Path) {
     let subdir1_path = create_dir_with_name_in_dir("subdir1", dir_path);
-    create_small_image_with_exif_in_dir(&subdir1_path);
+    create_small_image_with_exif_in_dir(&subdir1_path, "small-with-exifåäöあ!@#$%^&*().jpg");
 }
 
 fn create_subdir2_in_dir(dir_path: &Path) {
@@ -644,7 +644,7 @@ fn check_that_dst_structure_is_correct(dst_path: &Path, videos: bool) {
         "dir1/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
         "dir2",
         "dir2/subdir1",
-        "dir2/subdir1/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
+        "dir2/subdir1/   2010-03-14 11;22;33 small-with-exifåäöあ!@#$%^&*().jpg.jpg",
         "dir2/subdir2",
         "dir2/   2010-03-14 11;22;33 small-with-exif.jpg.jpg",
         "dir3",

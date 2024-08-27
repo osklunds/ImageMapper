@@ -93,7 +93,6 @@ fn all_top_level_items_in_destination_exist_in_source(
             continue;
         }
 
-        // TODO: test special chars and åäö and other unicode like Japanese
         // TODO: Include which file is missing
         return false;
     }

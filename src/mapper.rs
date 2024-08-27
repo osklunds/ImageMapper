@@ -78,20 +78,23 @@ fn all_top_level_items_in_destination_exist_in_source(
             unwrap!(destination_entry, "Could not open a destination entry");
 
         let file_name = destination_entry.file_name();
-        let file_name_try1 = file_name.to_str().expect("Could not convert to str");
-        let file_name_try2 = file_names::destination_image_name_to_source_image_name(file_name_try1);
+        let file_name = file_name.to_str().expect("Could not convert to str");
 
-        // println!("{:?}", file_name_try1);
-        // println!("{:?}", file_name_try2);
-
-        // TODO: Change all to try variants
-        if !(source_path.join(file_name_try1).exists() ||
-            (file_name_try2.is_some() && source_path.join(file_name_try2.unwrap()).exists())) {
-                // let src_entries = source_path.read_dir().unwrap().collect::<Vec<_>>();
-                // println!("oskar: {:?}", src_entries);
-                // println!("oskar: {:?}", source_path.join(file_name_try1).exists());
-            return false;
+        if source_path.join(file_name).exists() {
+            continue;
         }
+
+        // Try again assuming the file is a converted image
+        let file_name =
+            file_names::destination_image_name_to_source_image_name(
+                file_name,
+            );
+        if file_name.is_some() && source_path.join(file_name.unwrap()).exists() {
+            continue;
+        }
+
+        // TODO: Include which file is missing
+        return false;
     }
 
     true
@@ -267,17 +270,9 @@ fn iterate_destination_entries(
         let destination_entry_path = &destination_entry.path();
 
         if destination_entry_path.is_dir() {
-            handle_destination_dir(
-                destination_entry_path,
-                source_path,
-                opts,
-            );
+            handle_destination_dir(destination_entry_path, source_path, opts);
         } else {
-            handle_destination_file(
-                destination_entry_path,
-                source_path,
-                opts,
-            );
+            handle_destination_file(destination_entry_path, source_path, opts);
         }
     }
 }
@@ -318,17 +313,9 @@ fn handle_destination_file(
 ) {
     if let Some(extension) = destination_file_path.extension() {
         if file_names::extension_is_destination_image_extension(extension) {
-            handle_destination_image(
-                destination_file_path,
-                source_path,
-                opts,
-            );
+            handle_destination_image(destination_file_path, source_path, opts);
         } else if file_names::extension_is_video_extension(extension) {
-            handle_destination_video(
-                destination_file_path,
-                source_path,
-                opts,
-            );
+            handle_destination_video(destination_file_path, source_path, opts);
         } else {
             handle_destination_other_file(destination_file_path, opts);
         }

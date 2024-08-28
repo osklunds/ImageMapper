@@ -1,0 +1,18 @@
+services:
+  image-mapper-dev:
+    image: image-mapper-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: image-mapper-dev
+    environment:
+      - QUALITY=Mobile
+      - VIDEOS=true
+      - TIME=3600
+    volumes:
+        - ../test_resources:/src:ro
+        - destination-volume:/dst
+    restart: unless-stopped
+    init: true
+volumes:
+  destination-volume:

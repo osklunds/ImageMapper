@@ -1,0 +1,84 @@
+# Example configuration that uses ImageMapper and HTTPImageServer
+# together. 3 ImageMapper instances for each image quality. 2 HTTPImageServer
+# instances for mobile and TV image quality (both use thumbnail quality).
+# Source images are read from /home/oskar/Bilder and converted images are
+# stored in docker volumes.
+services:
+  thumbnail_mapper:
+    image: image-mapper
+    build:
+      context: ./image-mapper
+      dockerfile: Dockerfile
+    container_name: thumbnail_mapper
+    environment:
+      - QUALITY=Thumbnail
+      - VIDEOS=false
+      - TIME=3600
+    volumes:
+        - /home/oskar/Bilder:/src:ro
+        - thumbnail_images:/dst
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+    init: true
+  mobile_mapper:
+    image: image-mapper
+    container_name: mobile_mapper
+    environment:
+      - QUALITY=Mobile
+      - VIDEOS=false
+      - TIME=3600
+    volumes:
+        - /home/oskar/Bilder:/src:ro
+        - mobile_images:/dst
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+    init: true
+  tv_mapper:
+    image: image-mapper
+    container_name: tv_mapper
+    environment:
+      - QUALITY=TV
+      - VIDEOS=false
+      - TIME=3600
+    volumes:
+        - /home/oskar/Bilder:/src:ro
+        - tv_images:/dst
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+    init: true
+  mobile_image_server:
+    image: image-server
+    build:
+      context: ./http-image-server
+      dockerfile: Dockerfile
+    container_name: mobile_image_server
+    volumes:
+      - thumbnail_images:/thumbnail
+      - mobile_images:/full
+    ports:
+      - 8080:80
+    restart: unless-stopped
+    init: true
+  tv_image_server:
+    image: image-server
+    container_name: tv_image_server
+    volumes:
+      - thumbnail_images:/thumbnail
+      - tv_images:/full
+    ports:
+      - 8081:80
+    restart: unless-stopped
+    init: true
+volumes:
+  thumbnail_images:
+  mobile_images:
+  tv_images:

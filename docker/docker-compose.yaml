@@ -1,4 +1,5 @@
 # compose file used for development (building and testing)
+
 services:
   image-mapper-dev:
     # Use the line below instead to use a saved image

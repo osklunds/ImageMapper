@@ -1,7 +1,7 @@
 # compose file used for development (building and testing)
 services:
   image-mapper-dev:
-    image: image-mapper-dev
+    image: osklunds/image-mapper-dev
     build:
       context: ..
       dockerfile: docker/Dockerfile

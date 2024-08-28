@@ -4,7 +4,8 @@
 # Source images are read from /home/oskar/Bilder and converted images are
 # stored in docker volumes.
 
-# Note: HTTPImageServer is not fully containerized yet. A proof of concept can be found at: https://github.com/osklunds/containers
+# Note: HTTPImageServer is not fully containerized yet. A proof of concept can
+# be found at: https://github.com/osklunds/containers
 
 services:
   thumbnail_mapper:

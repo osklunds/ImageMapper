@@ -1,0 +1,22 @@
+# compose file used for development (building and testing)
+
+services:
+  image-mapper-dev:
+    # Use the line below instead to use a saved image
+    # image: osklunds/image-mapper--docker--2024-08-28--10-58-34--7eb2285
+    image: osklunds/image-mapper-dev
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: image-mapper-dev
+    environment:
+      - QUALITY=Mobile
+      - VIDEOS=true
+      - TIME=3600
+    volumes:
+        - ../test_resources:/src:ro
+        - image-mapper-dev-dst:/dst
+    restart: unless-stopped
+    init: true
+volumes:
+  image-mapper-dev-dst:

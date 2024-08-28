@@ -38,11 +38,27 @@ Currently when something goes wrong, `ImageMapper` will exit and print what happ
 
 ## Compatibility
 
-Platforms: Linux, Mac (most likely), Windows (maybe, but not the tests).
+Platforms: Linux, Docker, Mac (most likely), Windows (maybe, but not the tests).
 
 Images: jpg and png.
 
 Videos: mov, avi, mp4, m4v and mpg.
+
+## Docker
+
+A Docker version of `ImageMapper` exists in the `docker` directory. Some helpful commands to run inside the `docker` directory:
+
+- `docker compose build` to build.
+
+- `docker compose up` to run.
+
+- `./build-tag-and-save-image.sh` to build, tag and save the built image in one go. The saved image can be loaded into wherever you want to run your Docker containers.
+
+`docker-compose.yaml` is used during development for easy building and testing. It also serves as documentation of the environment variables and volumes needed when running the container.
+
+`docker-compose-example.yaml` is an example of how `ImageMapper` can be used together with my other project [HTTPImageServer](https://github.com/osklunds/HTTPImageServer). `ImageMapper` converts images to Docker volumes that `HTTPImageServer` then serves over HTTP.
+
+TODO: Add illustration of three `ImageMapper` instances reading from a source directory and saving to three Docker volumes. And then two `HTTPImageServer` instances reading from the Docker volumes and serving over HTTP.
 
 ## Credits
 

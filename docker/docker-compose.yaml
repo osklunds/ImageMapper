@@ -1,6 +1,8 @@
 # compose file used for development (building and testing)
 services:
   image-mapper-dev:
+    # Use the line below instead to use a saved image
+    # image: osklunds/image-mapper--docker--2024-08-28--10-58-34--7eb2285
     image: osklunds/image-mapper-dev
     build:
       context: ..

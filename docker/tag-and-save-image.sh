@@ -1,10 +1,13 @@
 #!/bin/bash
 
 branch=$(git rev-parse --abbrev-ref HEAD)
-commit=$(git rev-parse HEAD)
-datestamp=$(date +"%Y-%m-%d")
+date_and_commit_hash=$(git show --no-patch --no-notes \
+                           --pretty='%cd--%h' \
+                           --date=format:'%Y-%m-%d--%H-%M-%S' -s HEAD)
 
-file_name="image-mapper--$branch--$datestamp--$commit"
+echo $date_and_commit_hash
+
+file_name="image-mapper--$branch--$date_and_commit_hash"
 tag="osklunds/$file_name"
 
 echo "Tagging with tag '$tag'"

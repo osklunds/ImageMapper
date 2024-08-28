@@ -3,7 +3,9 @@
 FROM rust:1.80 as builder
 
 WORKDIR /usr/src
-COPY . .
+COPY Cargo.lock .
+COPY Cargo.toml .
+COPY src src
 RUN cargo install --locked --path .
 
 # The actual image

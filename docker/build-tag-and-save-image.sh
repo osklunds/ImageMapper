@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Build
-docker build .. -f Dockerfile --tag osklunds/image-mapper-dev
+docker build .. -f Dockerfile --tag osklunds/image-mapper-dev || exit 1
 
 # Tag
 branch=$(git rev-parse --abbrev-ref HEAD)

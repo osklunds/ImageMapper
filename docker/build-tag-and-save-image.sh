@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Build
+docker build .. -f Dockerfile --tag osklunds/image-mapper-dev
+
+# Tag
 branch=$(git rev-parse --abbrev-ref HEAD)
 date_and_commit_hash=$(git show --no-patch --no-notes \
                            --pretty='%cd--%h' \
@@ -14,6 +18,7 @@ echo "Tagging with tag '$tag'"
 
 docker tag osklunds/image-mapper-dev "$tag" || exit 1
 
+# Save
 out_path="saved_images/$file_name.tar"
 echo "Saving to '$out_path'"
 

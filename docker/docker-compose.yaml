@@ -1,9 +1,10 @@
+# compose file used for development (building and testing)
 services:
   image-mapper-dev:
     image: image-mapper-dev
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     container_name: image-mapper-dev
     environment:
       - QUALITY=Mobile
@@ -11,8 +12,8 @@ services:
       - TIME=3600
     volumes:
         - ../test_resources:/src:ro
-        - destination-volume:/dst
+        - image-mapper-dev-dst:/dst
     restart: unless-stopped
     init: true
 volumes:
-  destination-volume:
+  image-mapper-dev-dst:

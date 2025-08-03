@@ -597,7 +597,7 @@ fn test_destination_dir_has_multiple_entries_source_dir_does_not() {
 
     assert_eq!(
         Err(MapperError::DstTopLevelEntryNotInSrc(
-            file_only_in_dst1.clone()
+            file_only_in_dst2.clone()
         )),
         mapper::map_directory(&src_path, &dst_path, SETTINGS),
     );
@@ -714,10 +714,14 @@ fn check_that_dst_structure_is_correct(dst_path: &Path, videos: bool) {
     assert_dir_entries(&exp_dir_entries, dst_path);
 }
 
-fn assert_dir_entries(exp_dir_entries: &[&str], path: &Path) {
-    let dir_entries = get_dir_entries(path);
+fn assert_dir_entries(exp_dir_entries: &Vec<&str>, path: &Path) {
+    let mut exp_dir_entries = exp_dir_entries.clone();
+    exp_dir_entries.sort();
 
-    for (exp_line, line) in std::iter::zip(exp_dir_entries, &dir_entries) {
+    let mut dir_entries = get_dir_entries(path);
+    dir_entries.sort();
+
+    for (exp_line, line) in std::iter::zip(&exp_dir_entries, &dir_entries) {
         assert_eq!(
             exp_line, line,
             "exp:\n{:?} act:\n{:?}",

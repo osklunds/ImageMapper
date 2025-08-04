@@ -26,6 +26,12 @@ services:
       resources:
         limits:
           cpus: '0.25'
+          # When running image-mapper for a long time, I observed that the
+          # container consumes a lot of memory. My theory is that it's just
+          # Linux file caching consuming memory. So set a limit to avoid too
+          # much, but no harmful, memory usage. Even 125M should be enough but
+          # 500M gives some margin.
+          memory: 500M
     init: true
   mobile_mapper:
     image: image-mapper
@@ -42,6 +48,7 @@ services:
       resources:
         limits:
           cpus: '0.25'
+          memory: 500M
     init: true
   tv_mapper:
     image: image-mapper
@@ -58,6 +65,7 @@ services:
       resources:
         limits:
           cpus: '0.25'
+          memory: 500M
     init: true
   mobile_image_server:
     image: image-server
